@@ -215,6 +215,9 @@ const timeAgo=ts=>{ const d=new Date(ts); const s=Math.floor((Date.now()-d.getTi
 const pairKey=(a,b)=>a<b?`${a}__${b}`:`${b}__${a}`;
 function show(id){ ['#screenActive','#screenDiscover','#screenChat','#screenSettings'].forEach(sel=>document.querySelector(sel).classList.remove('active')); document.querySelector(id).classList.add('active'); }
 
+// Defensive: prevent double boot/renders if script is injected twice or re-fired
+let __booted = false;
+
 // ===== Identity & Profile =====
 function ensureIdentity(){let id=localStorage.getItem('tnbl:userId');if(!id){id=`user_${uuid()}`;localStorage.setItem('tnbl:userId', id);}return id;}
 const ME=ensureIdentity();
@@ -725,7 +728,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-function boot(){ updateAd(); seedActivityDummies(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ if(__booted) return; __booted = true; updateAd(); seedActivityDummies(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
