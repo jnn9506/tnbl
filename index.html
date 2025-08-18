@@ -56,9 +56,10 @@ select{padding:10px}
 /* Chat */
 .chat{display:grid; grid-template-rows: auto 1fr auto; height:65vh; gap:10px}
 .chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:12px; background:linear-gradient(180deg,#0f161b,#0b0f12)}
-.bub{max-width:80%; padding:8px 10px; border-radius:14px; margin:6px 0; line-height:1.35; font-weight:600}
-.me{background:var(--mint); color:#00120e; border-top-right-radius:6px; margin-left:auto; box-shadow:0 6px 16px rgba(0,245,212,.25)}
-.them{background:#0f1418; border:1px solid var(--line); color:#cfe9e3; border-top-left-radius:6px}
+.bub{display:inline-block; max-width:75%; min-width:36px; width:auto; padding:8px 10px; border-radius:14px; margin:8px 0 6px; line-height:1.35; font-weight:600; white-space:pre-wrap; word-break:break-word}
+.bub.cont{margin-top:3px}
+.me{display:block; width:fit-content; background:var(--mint); color:#00120e; border-top-right-radius:6px; margin-left:auto; box-shadow:0 6px 16px rgba(0,245,212,.25)}
+.them{display:inline-block; background:#0f1418; border:1px solid var(--line); color:#cfe9e3; border-top-left-radius:6px}
 .ts{font-size:10px; color:#7faea3; margin-top:2px; display:block}
 .me .ts{ text-align:right }
 
