@@ -14,12 +14,12 @@ body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, 
 
 /* Header + Top Ad */
 header{position:sticky; top:0; z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
-.top{display:flex; align-items:center; gap:10px; padding:12px 14px}
+.top{display:flex; align-items:center; gap:10px; padding:8px 14px}
 .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
 .dot{width:14px; height:14px; border-radius:50%; background:var(--mint); box-shadow:0 0 24px var(--mint)}
 .spacer{flex:1}
 .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0f1418; color:var(--ink); border:1px solid var(--line); font-weight:800}
-.ad-slot{background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:8px}
+.ad-slot{background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:6px; margin:0}
 .ad-top-fixed{position:fixed; top:0; left:0; right:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
 .ad-inner{width:100%; max-width:420px; height:100%; display:flex; align-items:center; justify-content:center; padding:0 14px}
 .ad-infeed{display:flex; align-items:center; justify-content:center; background:#0f1418; border:1px dashed #133d36; color:#89afa6; border-radius:12px; padding:10px; margin:8px 0}
@@ -356,7 +356,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   const p1=uAll[0]; appendMsg('tnbl:thread:'+pairKey(ME,p1.id), p1.id, ME, 'hey—want to talk now?'); const m1=ensureMeta(p1.id); m1.unread=(m1.unread||0)+1; m1.accepted=false; m1.requested=false; setMeta(p1.id,m1);
   const p2=uAll[1]; appendMsg('tnbl:thread:'+pairKey(ME,p2.id), ME, p2.id, "let's chat, 5 mins?"); const m2=ensureMeta(p2.id); m2.accepted=false; m2.requested=true; setMeta(p2.id,m2);
   const p3=uAll[2]; const key3='tnbl:thread:'+pairKey(ME,p3.id); appendMsg(key3,p3.id,ME,'hi! new here, up for text?'); appendMsg(key3,ME,p3.id,'hey'); const m3=ensureMeta(p3.id); m3.accepted=true; m3.unread=0; setMeta(p3.id,m3);
-  renderLists(); updateNavBadges(); }
+  updateNavBadges(); }
 
 // ===== Boot =====
 function boot(){ updateAd(); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
@@ -725,7 +725,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-function boot(){ updateAd(); setAdOffsets(localStorage.getItem('tnbl:adOff')==='1'); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ updateAd(); seedActivityDummies(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
