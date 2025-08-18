@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>TNBL – Talk Now Before Look • Mobile‑first Dark (Neon Mint)</title>
+<style>
+/* ===== THEME ===== */
+:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: var(--ad-h); --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink);} 
+.container{max-width:420px; margin:0 auto; padding:14px}
+
+/* Header + Top Ad */
+header{position:sticky; top:var(--ad-offset); z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
+.top{display:flex; align-items:center; gap:10px; padding:12px 14px}
+.brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
+.dot{width:14px; height:14px; border-radius:50%; background:var(--mint); box-shadow:0 0 24px var(--mint)}
+.spacer{flex:1}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0f1418; color:var(--muted); border:1px solid var(--line); font-weight:800}
+.ad-slot{display:block; background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:8px}
+.ad-top-fixed{position:fixed; top:0; left:0; right:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
+
+/* Buttons */
+button{font-weight:900}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:auto; padding:10px 14px; border-radius:14px; border:1px solid var(--line); background:#0f1418; color:#var(--ink); cursor:pointer; box-shadow:var(--shadow); transition:transform 120ms var(--ease-spring), background 160ms}
+.btn:active{transform:scale(.95)}
+.btn.mint{background:var(--mint); color:#02110e; border-color:transparent}
+.btn.mint:hover{background:var(--mint-2)}
+.btn.ghost{background:#0f1418; color:#var(--ink)}
+.btn.sm{padding:6px 8px; width:auto}
+
+main{padding:12px; padding-bottom:160px}
+.screen{display:none; opacity:0; transform:translateX(30px); transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen.active{display:block; opacity:1; transform:translateX(0)}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
+.title{font-size:18px; font-weight:900}
+.muted{color:var(--muted)}
+.row{display:flex; gap:8px}
+
+/* Lists */
+.list-wrap{height:56vh; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); background:#0f1418}
+.user-item{display:flex; justify-content:space-between; gap:10px; padding:12px; border-bottom:1px solid var(--line); position:relative; transition:background 160ms}
+.user-item:hover{background:#0d1317}
+.meta .line1{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.meta .line2{color:var(--muted); font-size:12px; margin-top:2px}
+.chip{display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:#9ad6cc; margin:0 6px}
+.badge{display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 6px; font-size:11px; font-weight:900; border-radius:999px; background:var(--mint); color:#02110e; margin-left:6px}
+
+/* Form controls */
+input,select,textarea{background:#0f1418; color:var(--ink); border:1px solid var(--line); border-radius:12px; padding:10px; outline:none}
+input::placeholder,textarea::placeholder{color:#6f9189}
+select{padding:10px}
+
+/* Chat */
+.chat{display:grid; grid-template-rows: auto 1fr auto; height:65vh; gap:10px}
+.chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:8px; background:linear-gradient(180deg,#0f161b,#0b0f12)}
+.bub{max-width:80%; padding:8px 10px; border-radius:14px; margin:6px 0; line-height:1.35; font-weight:600}
+.me{background:var(--mint); color:#00120e; border-top-right-radius:6px; margin-left:auto; box-shadow:0 6px 16px rgba(0,245,212,.25)}
+.them{background:#0f1418; border:1px solid var(--line); color:#cfe9e3; border-top-left-radius:6px}
+.ts{font-size:10px; color:#7faea3; margin-top:2px}
+
+/* Animations */
+@keyframes popIn{0%{opacity:0;transform:translateY(6px) scale(.95)}100%{opacity:1;transform:none}}
+@keyframes flashIn{0%{box-shadow:0 0 0 0 rgba(0,245,212,0)}30%{box-shadow:0 0 0 8px rgba(0,245,212,.12)}100%{box-shadow:0 0 0 0 rgba(0,245,212,0)}}
+.bub.pop{animation:popIn 260ms var(--ease-pop)}
+.bub.flash{animation:flashIn 900ms var(--ease-spring)}
+
+/* Ripple / press */
+.touchable{transition:transform 110ms var(--ease-spring)}
+.touchable:active{transform:translateY(1px) scale(.99)}
+.ripple-host{position:relative; overflow:hidden}
+.ripple{position:absolute; border-radius:999px; transform:translate(-50%,-50%) scale(0); pointer-events:none; opacity:0; width:10px; height:10px; background:radial-gradient(circle, rgba(0,245,212,.35) 0%, rgba(0,245,212,.12) 55%, rgba(0,245,212,0) 70%); animation:ripIn 450ms cubic-bezier(.2,.85,.25,1)}
+@keyframes ripIn{0%{opacity:0; transform:translate(-50%,-50%) scale(.2)}25%{opacity:.85}100%{opacity:0; transform:translate(-50%,-50%) scale(16)}}
+
+/* Slide transitions for tabs */
+.screen.anim{transition:transform 260ms var(--ease-spring), opacity 260ms var(--ease-spring)}
+.slide-in-left{opacity:0; transform:translateX(-24px)}
+.slide-in-right{opacity:0; transform:translateX(24px)}
+.slide-out-left{opacity:0; transform:translateX(-24px)}
+.slide-out-right{opacity:0; transform:translateX(24px)}
+
+/* Scrollbar hide */
+.list-wrap, .chat-log{scrollbar-width:none}
+.list-wrap::-webkit-scrollbar, .chat-log::-webkit-scrollbar{width:0;height:0}
+
+/* Tabbar accents */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,15,18,.9);border-top:1px solid var(--line)}
+.tabbar .inner{max-width:420px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px}
+.tabbar .tab{user-select:none;text-align:center;font-weight:900;color:#a4c7be;cursor:pointer}
+.tabbar .tab.active small{color:var(--mint)}
+
+</style>
+</head>
+<body>
+<!-- Ad slot ABOVE header -->
+<div id="adTop" class="container ad-slot ad-top-fixed">Ad slot (320×50 / 320×100)</div>
+<div id="adSpacer" style="height:var(--ad-h)"></div>
+<header>
+  <div class="top container">
+    <div class="brand"><span class="dot"></span> TNBL <span class="muted">Talk Now Before Look</span></div>
+    <div class="spacer"></div>
+    <span class="pill" id="adminToggle">Dev</span>
+    <span class="pill">Ads: <strong id="adState">ON</strong></span>
+  </div>
+</header>
+<main class="container">
+  <!-- Admin (foldable) -->
+  <div id="adminPanel" class="card" style="display:none; margin-bottom:10px">
+    <div class="title" style="margin-bottom:8px">Admin / QA</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button id="seedBtn" class="btn mint">Seed 20 users</button>
+      <button id="clearBtn" class="btn ghost">Clear users</button>
+      <button id="toggleAdBtn" class="btn ghost">Ad OFF</button>
+      <button id="seedActivityBtn" class="btn ghost">Seed activity</button>
+    </div>
+  </div>
+
+  <!-- ACTIVE -->
+  <section id="screenActive" class="screen active">
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex; justify-content:space-between; align-items:center">
+        <div class="title">Active</div>
+        <span id="activeCount" class="pill">0</span>
+      </div>
+    </div>
+    <div class="list-wrap"><ul id="activeList" style="list-style:none; margin:0; padding:0"></ul></div>
+  </section>
+
+  <!-- DISCOVER -->
+  <section id="screenDiscover" class="screen">
+    <div class="card" style="margin-bottom:10px">
+      <div class="title">Discover</div>
+      <div class="row" style="margin-top:8px; flex-wrap:wrap">
+        <select id="fGender"><option value="">All</option><option value="M">Male</option><option value="F">Female</option></select>
+        <select id="fState"><option value="">All</option><option>CA</option><option>NY</option><option>TX</option><option>FL</option><option>WA</option><option>IL</option><option>NV</option></select>
+        <input id="fAgeMin" type="number" placeholder="18" min="18" max="99" />
+        <input id="fAgeMax" type="number" placeholder="99" min="18" max="99" />
+        <button id="fApply" class="btn mint sm">Apply</button>
+        <button id="fClear" class="btn ghost sm">Clear</button>
+      </div>
+    </div>
+    <div id="adMid" class="ad-slot" style="height:260px; margin-bottom:10px">Ad slot (300×250)</div>
+    <div id="listWrap" class="list-wrap"><ul id="userList" style="list-style:none; margin:0; padding:0"></ul></div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="screenChat" class="screen">
+    <div class="card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center">
+      <div class="row"><button id="backBtn" class="btn ghost sm">← Back</button><div><div class="title" id="chatName">Chat</div><div class="muted" id="chatMeta"></div></div></div>
+      <div class="row"><button id="leaveBtn" class="btn ghost sm">Leave</button></div>
+    </div>
+    <div class="chat">
+      <div id="log" class="chat-log"></div>
+      <div id="adChat" class="ad-slot" style="height:60px">Ad slot (320×50)</div>
+      <div class="row"><input id="msg" placeholder="Type a message…" maxlength="240" style="flex:1"/><button id="send" class="btn mint">Send</button></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="screenSettings" class="screen">
+    <div class="card">
+      <div class="title">Your profile</div>
+      <form id="settingsForm" class="form" style="display:grid; gap:10px; margin-top:8px">
+        <div class="row"><input id="meName" placeholder="Nickname" maxlength="24" style="flex:1"/><select id="meGender"><option value="">Gender</option><option value="M">Male</option><option value="F">Female</option></select><input id="meAge" type="number" min="18" max="99" placeholder="Age" style="width:90px"/></div>
+        <div class="row"><select id="meState"><option value="">State</option><option>CA</option><option>NY</option><option>TX</option><option>FL</option><option>WA</option><option>IL</option><option>NV</option></select><input id="meBio" maxlength="30" placeholder="Short intro (≤30)" style="flex:1"/></div>
+        <div class="row"><button class="btn mint" type="submit">Save</button><button class="btn ghost" id="cancelEdit" type="button">Cancel</button></div>
+        <div class="row"><button id="buyRemoveAds" class="btn mint" type="button">Remove Ads – $1 (demo)</button></div>
+      </form>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div class="title">Legal & Version</div>
+      <div class="muted" style="font-size:12px; margin-top:6px; line-height:1.5">
+        TNBL is intended for users aged 18+ in the United States. By using this service, you agree to our Terms and Privacy. Practice safety: do not share sensitive info, meet in public places, and report suspicious behavior.
+        <div style="margin-top:6px">
+          • Terms of Service • Privacy Policy • Safety Tips • Community Guidelines • Report • DMCA • Contact: support@tnbl.example
+        </div>
+        <div style="margin-top:6px">© 2025 TNBL. All rights reserved. Version: <strong id="appVersion">v1.10.001</strong></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- TABBAR NAVIGATION (text-only) -->
+<nav class="tabbar">
+  <div class="inner">
+    <div class="tab active" data-tab="#screenActive"><small>Active</small><span id="navBadgeActive" class="nav-badge" style="display:none;margin-left:6px;background:var(--mint);color:#02110e;padding:0 6px;border-radius:999px;min-width:18px;height:18px;line-height:18px;font-size:11px">0</span></div>
+    <div class="tab" data-tab="#screenDiscover"><small>Discover</small></div>
+    <div class="tab" data-tab="#screenSettings"><small>Profile</small></div>
+  </div>
+</nav>
+
+<!-- REQUEST SHEET -->
+<div id="requestModal" class="modal" style="position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.35);z-index:40">
+  <div class="sheet" style="width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-top-left-radius:16px;border-top-right-radius:16px;padding:14px;box-shadow:var(--shadow)">
+    <h3>Send chat request</h3>
+    <div class="hint">First message (max 30 chars). Chat opens after they accept.</div>
+    <textarea id="reqText" rows="2" maxlength="30" placeholder="Say hi…" style="width:100%; margin:6px 0"></textarea>
+    <div class="muted" style="font-size:11px; text-align:right"><span id="reqCount">0</span>/30</div>
+    <div class="row"><button id="reqSend" class="btn mint" type="button">Send request</button><button id="reqCancel" class="btn ghost" type="button">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+// ===== Utilities =====
+const $=s=>document.querySelector(s);const $$=s=>Array.from(document.querySelectorAll(s));
+const uuid=()=>crypto?.randomUUID?.()||(Date.now().toString(36)+Math.random().toString(36).slice(2));
+const nowISO=()=>new Date().toISOString();
+const timeAgo=ts=>{ const d=new Date(ts); const s=Math.floor((Date.now()-d.getTime())/1000); if(s<60) return `${s}s ago`; const m=Math.floor(s/60); if(m<60) return `${m}m ago`; const h=Math.floor(m/60); if(h<24) return `${h}h ago`; const d2=Math.floor(h/24); if(d2<7) return `${d2}d ago`; const w=Math.floor(d2/7); if(w<4) return `${w}w ago`; const mo=Math.floor(d2/30); if(mo<12) return `${mo}mo ago`; const y=Math.floor(d2/365); return `${y}y ago`; };
+const pairKey=(a,b)=>a<b?`${a}__${b}`:`${b}__${a}`;
+function show(id){ ['#screenActive','#screenDiscover','#screenChat','#screenSettings'].forEach(sel=>document.querySelector(sel).classList.remove('active')); document.querySelector(id).classList.add('active'); }
+
+// ===== Identity & Profile =====
+function ensureIdentity(){let id=localStorage.getItem('tnbl:userId');if(!id){id=`user_${uuid()}`;localStorage.setItem('tnbl:userId', id);}return id;}
+const ME=ensureIdentity();
+const PROFILE_KEY='tnbl:me';
+function getMe(){ return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); }
+function saveMe(p){ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+function validateProfile(p){ if(!p.name || !p.gender || !p.age || !p.state) return {ok:false,msg:'Please fill all fields (18+).'}; if(p.age<18) return {ok:false,msg:'18+ only.'}; if((p.bio||'').length>30) return {ok:false,msg:'Bio must be ≤ 30 chars.'}; return {ok:true}; }
+
+// ===== Thread Meta (accept / unread / requested) =====
+const metaKey=(other)=>'tnbl:meta:'+pairKey(ME, other);
+function getMeta(other){ return JSON.parse(localStorage.getItem(metaKey(other))||'{}'); }
+function setMeta(other, m){ localStorage.setItem(metaKey(other), JSON.stringify(m)); }
+function ensureMeta(other){ const m=getMeta(other)||{}; return {accepted: !!m.accepted, unread: m.unread||0, lastReadTs: m.lastReadTs||0, requested: !!m.requested}; }
+function acceptChat(other){ const m=ensureMeta(other); m.accepted=true; m.unread=0; m.requested=false; m.lastReadTs=Date.now(); setMeta(other,m); renderLists(); updateNavBadges(); }
+function leaveChatHard(other){ const key='tnbl:thread:'+pairKey(ME,other); localStorage.removeItem(key); localStorage.removeItem(metaKey(other)); renderLists(); updateNavBadges(); }
+function leaveChat(other){ if(!confirm('Leave this chat? This will delete the conversation.')) return; leaveChatHard(other); }
+function cancelRequest(other){ const m=ensureMeta(other); m.requested=false; setMeta(other,m); const key='tnbl:thread:'+pairKey(ME,other); localStorage.removeItem(key); renderLists(); updateNavBadges(); }
+function rejectIncoming(other){ const key='tnbl:thread:'+pairKey(ME,other); localStorage.removeItem(key); localStorage.removeItem(metaKey(other)); renderLists(); updateNavBadges(); }
+
+// ===== Data (localStorage) =====
+function seedUsers(n=20){ const users=JSON.parse(localStorage.getItem('tnbl:users')||'[]'); const states=["CA","NY","TX","FL","WA","IL","NV"]; const genders=['M','F']; for(let i=0;i<n;i++){ const now=Date.now(); const seen=new Date(now - Math.floor(Math.random()*7*24*60*60*1000)); users.push({ id:`user_${uuid()}`, name:`User${Math.floor(Math.random()*900+100)}`, gender:genders[Math.floor(Math.random()*genders.length)], age:18+Math.floor(Math.random()*27), state:states[Math.floor(Math.random()*states.length)], bio:'Here for chats', createdAt:nowISO(), lastSeen: seen.toISOString() }); } localStorage.setItem('tnbl:users', JSON.stringify(users)); renderLists(); }
+function clearUsers(){ localStorage.removeItem('tnbl:users'); Object.keys(localStorage).filter(k=>k.startsWith('tnbl:thread:')||k.startsWith('tnbl:meta:')).forEach(k=>localStorage.removeItem(k)); renderLists(); updateNavBadges(); }
+function listUsers(){ const users=JSON.parse(localStorage.getItem('tnbl:users')||'[]'); return users.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); }
+function touchSeen(userId){ const users=JSON.parse(localStorage.getItem('tnbl:users')||'[]'); const i=users.findIndex(u=>u.id===userId); if(i>-1){ users[i].lastSeen=nowISO(); localStorage.setItem('tnbl:users', JSON.stringify(users)); } }
+function appendMsg(key,from,to,content){ const arr=JSON.parse(localStorage.getItem(key)||'[]'); arr.push({id:uuid(),from,to,content,ts:nowISO()}); localStorage.setItem(key, JSON.stringify(arr)); return arr; }
+function sendMessage(to,content){ const key='tnbl:thread:'+pairKey(ME,to); const arr=appendMsg(key,ME,to,content); const m=ensureMeta(to); if(!m.accepted){ m.requested=true; } setMeta(to,m); touchSeen(to); updateNavBadges(); return arr; }
+function pushIncoming(fromId,content){ const key='tnbl:thread:'+pairKey(ME,fromId); const arr=appendMsg(key,fromId,ME,content); const m=ensureMeta(fromId); if(!(document.querySelector('#screenChat').classList.contains('active') && currentPeer && currentPeer.id===fromId)) { m.unread=(m.unread||0)+1; } setMeta(fromId,m); touchSeen(fromId); renderLists(); updateNavBadges(); return arr; }
+function loadThread(other){ const key='tnbl:thread:'+pairKey(ME,other); return JSON.parse(localStorage.getItem(key)||'[]'); }
+
+// ===== Discover Filters =====
+function getFilters(){ return { gender:$('#fGender').value||'', state:$('#fState').value||'', min: Number($('#fAgeMin').value||0), max: Number($('#fAgeMax').value||0) }; }
+function clearFilters(){ $('#fGender').value=''; $('#fState').value=''; $('#fAgeMin').value=''; $('#fAgeMax').value=''; renderLists(); }
+function filterUsers(users, f){ return users.filter(u=>{ if(f.gender && u.gender!==f.gender) return false; if(f.state && u.state!==f.state) return false; if(f.min && u.age<f.min) return false; if(f.max && u.age>f.max) return false; return true; }); }
+
+// ===== Request UI =====
+let requestPeer=null;
+function openRequest(user){ requestPeer=user; $('#reqText').value=''; const c=$('#reqCount'); if(c) c.textContent='0'; $('#requestModal').style.display='flex'; }
+function closeRequest(){ $('#requestModal').style.display='none'; requestPeer=null; }
+$('#reqCancel').addEventListener('click',closeRequest);
+$('#reqText').addEventListener('input',()=>{ const v=$('#reqText').value||''; const c=$('#reqCount'); if(c) c.textContent=String(v.length); });
+$('#reqSend').addEventListener('click',()=>{ const t=$('#reqText').value.trim(); if(!requestPeer) return; if(!t){ alert('Please write a short message (≤30).'); return;} if(t.length>30){ alert('Must be ≤ 30 chars.'); return;} sendMessage(requestPeer.id,t); const m=ensureMeta(requestPeer.id); m.accepted=false; m.requested=true; setMeta(requestPeer.id,m); closeRequest(); selectTab('#screenActive'); renderLists(); updateNavBadges(); alert('Request sent. Wait for acceptance.'); });
+
+// ===== Drag-to-scroll =====
+function enableDragScroll(el){ if(!el) return; let isDown=false,startY=0,scrollTop=0; el.addEventListener('mousedown',e=>{isDown=true;el.classList.add('grabbing');startY=e.pageY;scrollTop=el.scrollTop;e.preventDefault();}); window.addEventListener('mouseup',()=>{isDown=false;el.classList.remove('grabbing');}); el.addEventListener('mousemove',e=>{if(!isDown)return; const walk=(e.pageY-startY); el.scrollTop=scrollTop-walk;}); }
+
+// ===== UI: Active & Discover =====
+function activePeers(all){ return all.filter(u=> ensureMeta(u.id).accepted ).sort((a,b)=>{ const la=loadThread(a.id).slice(-1)[0]?.ts||'0'; const lb=loadThread(b.id).slice(-1)[0]?.ts||'0'; return new Date(lb)-new Date(la); }); }
+function pendingPeers(all){ return all.filter(u=> { const m=ensureMeta(u.id); return !m.accepted && loadThread(u.id).length>0; }); }
+function renderLists(){ const all=listUsers(); const act=activePeers(all); const pend=pendingPeers(all); const actIds=new Set(act.map(x=>x.id)); const A=$('#activeList'); A.innerHTML=''; $('#activeCount').textContent=String(act.length + pend.length);
+  const renderItem=(u)=>{ const m=ensureMeta(u.id); const thread=loadThread(u.id); const lastTs = thread.slice(-1)[0]?.ts || u.lastSeen || u.createdAt; const firstIncoming = thread.find(x=>x.from===u.id)?.content; const stateChip = m.accepted ? '<span class="chip">CHATTING</span>' : (m.requested ? '<span class="chip" style="border-color:#59f; color:#59f">REQUESTED</span>' : '<span class="chip" style="border-color:#ffd166; color:#ffd166">PENDING</span>');
+    const badge = (m.unread>0)?`<span class="badge">${m.unread}</span>`:''; 
+    const li=document.createElement('li'); li.className='user-item';
+    li.innerHTML=`<div class="meta"><div class="line1"><strong>${u.name}</strong> ${stateChip}${badge}<span class="muted">• ${u.age} • ${u.gender} • ${u.state}</span></div><div class="line2">${(!m.accepted && !m.requested && firstIncoming)?`request: ${escapeHtml(firstIncoming.slice(0,30))} • `:''}last seen: ${timeAgo(lastTs)}</div></div>`;
+    const btns=document.createElement('div'); btns.className='row';
+    if(!m.accepted && !m.requested){ const acc=document.createElement('button'); acc.className='btn mint sm'; acc.textContent='Accept'; acc.addEventListener('click',(e)=>{e.stopPropagation(); acceptChat(u.id);}); btns.appendChild(acc); const rej=document.createElement('button'); rej.className='btn ghost sm'; rej.textContent='Reject'; rej.addEventListener('click',(e)=>{e.stopPropagation(); rejectIncoming(u.id);}); btns.appendChild(rej); }
+    if(!m.accepted && m.requested){ const cancel=document.createElement('button'); cancel.className='btn ghost sm'; cancel.textContent='Cancel'; cancel.addEventListener('click',(e)=>{e.stopPropagation(); cancelRequest(u.id);}); btns.appendChild(cancel); }
+    if(m.accepted){ const leave=document.createElement('button'); leave.className='btn ghost sm'; leave.textContent='Leave'; leave.addEventListener('click',(e)=>{e.stopPropagation(); leaveChat(u.id);}); btns.appendChild(leave); }
+    const open=document.createElement('button'); open.className='btn ghost sm'; open.textContent='Open'; open.disabled=!m.accepted; open.addEventListener('click',(e)=>{e.stopPropagation(); if(m.accepted) openChat(u);}); btns.appendChild(open);
+    li.appendChild(btns);
+    return li; };
+  if(pend.length===0 && act.length===0){ A.innerHTML='<li class="muted" style="padding:14px">No active or pending chats</li>'; }
+  else { pend.forEach(u=>A.appendChild(renderItem(u))); act.forEach(u=>A.appendChild(renderItem(u))); }
+  // Discover
+  const D=$('#userList'); D.innerHTML=''; const filters=getFilters(); let discover=all.filter(u=> !actIds.has(u.id) && loadThread(u.id).length===0 ); discover=filterUsers(discover, filters);
+  if(!discover.length){ D.innerHTML='<li class="muted" style="padding:14px">No users match filters</li>'; } 
+  else { discover.forEach(u=>{ const lastTs=u.lastSeen||u.createdAt; const li=document.createElement('li'); li.className='user-item'; li.innerHTML=`<div class="meta"><div class="line1"><strong>${u.name}</strong><span class="muted"> • ${u.age} • ${u.gender} • ${u.state}</span></div><div class="line2">${escapeHtml(u.bio||'')} • last seen: ${timeAgo(lastTs)}</div></div>`; li.addEventListener('click',()=>openRequest(u)); D.appendChild(li); }); }
+  updateNavBadges();
+  makeTouchable('.btn, .tab, .user-item, .ad-slot');
+}
+
+// ===== UI: Chat =====
+let currentPeer=null; function openChat(user){ const m=ensureMeta(user.id); if(!m.accepted){ alert('Accept first to open the chat.'); return; } currentPeer=user; m.unread=0; m.lastReadTs=Date.now(); setMeta(user.id,m); $('#chatName').textContent=user.name; $('#chatMeta').textContent=`${user.age} • ${user.gender} • ${user.state}`; renderChat(); show('#screenChat'); updateNavBadges(); }
+function renderChat(){ const log=$('#log'); log.innerHTML=''; if(!currentPeer){ return; } const msgs=loadThread(currentPeer.id); msgs.forEach(m=>{ const div=document.createElement('div'); div.className='bub '+(m.from===ME?'me':'them'); div.innerHTML=`${escapeHtml(m.content)}<div class="ts">${timeAgo(m.ts)}</div>`; log.appendChild(div); }); log.scrollTop=log.scrollHeight; }
+function escapeHtml(s=''){ return s.replace(/[&<>"']/g, function(c){ return c==='&'?'&amp;': c==='<'?'&lt;': c==='>'?'&gt;': c==='"'?'&quot;':'&#39;'; }); }
+
+// ===== Nav badges =====
+function unreadTotal(){ const all=listUsers(); return all.reduce((acc,u)=>acc+ensureMeta(u.id).unread,0); }
+function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ const m=ensureMeta(u.id); return !m.accepted && !m.requested && loadThread(u.id).length>0; }).length; }
+function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
+
+// ===== Ads (device scoped) =====
+function setAdOffsets(off){ const adVisible = !off; document.documentElement.style.setProperty('--ad-offset', adVisible ? 'var(--ad-h)' : '0px'); const spacer=document.getElementById('adSpacer'); if(spacer){ spacer.style.height = adVisible ? getComputedStyle(document.documentElement).getPropertyValue('--ad-h') : '0px'; } }
+function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; const adEl=$('#adState'); if(adEl) adEl.textContent = off ? 'OFF' : 'ON'; $$('.ad-slot').forEach(el=>{ el.style.display = off ? 'none' : 'block'; }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
+
+// ===== Tabbar / Binds =====
+function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right'; next.classList.add('active','anim'); current?.classList.add('anim'); if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); } setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right'); next.classList.remove('anim','slide-in-left','slide-in-right'); },260); $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
+$$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
+
+// Admin panel
+$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ p.style.display = (p.style.display==='none'||!p.style.display)?'block':'none'; }});
+$('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); renderLists(); });
+$('#clearBtn').addEventListener('click',()=>{ clearUsers(); renderLists(); });
+$('#toggleAdBtn').addEventListener('click',()=>{ const off = localStorage.getItem('tnbl:adOff')==='1'; localStorage.setItem('tnbl:adOff', off ? '0' : '1'); updateAd(); });
+$('#seedActivityBtn').addEventListener('click',()=>{ seedActivityDummies(); renderLists(); });
+
+// Profile form
+$('#settingsForm').addEventListener('submit',(e)=>{ e.preventDefault(); const p={ name:$('#meName').value.trim(), gender:$('#meGender').value, age:Number($('#meAge').value||0), state:$('#meState').value, bio:$('#meBio').value.trim() }; const v=validateProfile(p); if(!v.ok){ alert(v.msg); return; } saveMe(p); selectTab('#screenDiscover'); renderLists(); });
+$('#cancelEdit').addEventListener('click',()=>selectTab('#screenDiscover'));
+$('#buyRemoveAds').addEventListener('click',()=>{ localStorage.setItem('tnbl:adOff','1'); updateAd(); alert('Ads removed (demo).'); });
+
+// Discover filters binds
+$('#fApply').addEventListener('click',()=>renderLists());
+$('#fClear').addEventListener('click',clearFilters);
+
+// Chat binds
+$('#backBtn').addEventListener('click',()=>{ selectTab('#screenActive'); renderLists(); updateNavBadges(); });
+$('#leaveBtn').addEventListener('click',()=>{ if(currentPeer){ if(confirm('Leave this chat? This will delete the conversation.')){ leaveChatHard(currentPeer.id); selectTab('#screenActive'); } }});
+$('#send').addEventListener('click',()=>{ if(!currentPeer) return; const m=ensureMeta(currentPeer.id); const inp=$('#msg'); const t=inp.value.trim(); if(!t) return; if(!m.accepted){ alert('Chat is not accepted. Use Active tab to accept.'); return; } sendMessage(currentPeer.id,t); inp.value=''; try{ navigator.vibrate && navigator.vibrate(10);}catch(e){} renderChat(); animateLastBubble('me'); setTimeout(()=>{pushIncoming(currentPeer.id,'👋 quick vibe check—up for a chat?'); try{ navigator.vibrate && navigator.vibrate([10,30,10]); }catch(e){} renderChat(); animateLastBubble('them');},600); });
+$('#msg').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#send').click();}});
+
+// Touch ripple bind helper
+function makeTouchable(selector){ document.querySelectorAll(selector).forEach(el=>{ if(!el.classList.contains('ripple-host')) el.classList.add('ripple-host'); if(!el.classList.contains('touchable')) el.classList.add('touchable'); el.addEventListener('pointerdown',(e)=>{ try{navigator.vibrate && navigator.vibrate(8);}catch(_){} const r=document.createElement('span'); r.className='ripple'; const rect=el.getBoundingClientRect(); r.style.left=(e.clientX-rect.left)+'px'; r.style.top=(e.clientY-rect.top)+'px'; el.appendChild(r); r.addEventListener('animationend',()=>r.remove(),{once:true}); },{passive:true}); }); }
+
+// Chat bubble emphasis
+function animateLastBubble(role){ const log=document.getElementById('log'); if(!log) return; const els=log.querySelectorAll('.bub.'+(role==='me'?'me':'them')); if(!els.length) return; const el=els[els.length-1]; el.classList.remove('pop','flash'); void el.offsetWidth; el.classList.add(role==='me'?'pop':'flash'); }
+
+// Swipe between tabs (avoid when Chat active or modal open)
+(function(){ const order=['#screenActive','#screenDiscover','#screenSettings']; let sx=0, sy=0; const TH=60; const area=document.querySelector('main'); area.addEventListener('touchstart',e=>{ if(e.touches.length!==1) return; if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true}); area.addEventListener('touchend',e=>{ if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)<TH || Math.abs(dx)<=Math.abs(dy)) return; const curTab=document.querySelector('.tab.active')?.getAttribute('data-tab')||order[0]; let i=order.indexOf(curTab); if(dx<0 && i<order.length-1) selectTab(order[i+1]); else if(dx>0 && i>0) selectTab(order[i-1]); },{passive:true});})();
+
+// ===== Demo activity dummies =====
+function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ seedUsers(10); }
+  const uAll=listUsers(); if(uAll.length<3) return;
+  const p1=uAll[0]; appendMsg('tnbl:thread:'+pairKey(ME,p1.id), p1.id, ME, 'hey—want to talk now?'); const m1=ensureMeta(p1.id); m1.unread=(m1.unread||0)+1; m1.accepted=false; m1.requested=false; setMeta(p1.id,m1);
+  const p2=uAll[1]; appendMsg('tnbl:thread:'+pairKey(ME,p2.id), ME, p2.id, "let's chat, 5 mins?"); const m2=ensureMeta(p2.id); m2.accepted=false; m2.requested=true; setMeta(p2.id,m2);
+  const p3=uAll[2]; const key3='tnbl:thread:'+pairKey(ME,p3.id); appendMsg(key3,p3.id,ME,'hi! new here, up for text?'); appendMsg(key3,ME,p3.id,'hey'); const m3=ensureMeta(p3.id); m3.accepted=true; m3.unread=0; setMeta(p3.id,m3);
+  renderLists(); updateNavBadges(); }
+
+// ===== Boot =====
+function boot(){ updateAd(); setAdOffsets(localStorage.getItem('tnbl:adOff')==='1'); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+document.addEventListener('DOMContentLoaded',boot);
+</script>
+</body>
+</html>
