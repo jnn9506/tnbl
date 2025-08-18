@@ -6,11 +6,11 @@
 <title>TNBL – Talk Now Before Look • Mobile‑first Dark (Neon Mint)</title>
 <style>
 /* ===== THEME ===== */
-:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: var(--ad-h); --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
+:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: var(--ad-h); --app-w:420px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink); padding-top: var(--ad-offset);} 
-.container{max-width:420px; margin:0 auto; padding:14px}
+.container{width:min(var(--app-w), 100vw); margin:0 auto; padding:14px}
 
 /* Header + Top Ad */
 header{position:sticky; top:0; z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
@@ -21,7 +21,7 @@ header{position:sticky; top:0; z-index:30; backdrop-filter: blur(8px); backgroun
 .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0f1418; color:var(--ink); border:1px solid var(--line); font-weight:800}
 .ad-slot{display:block; background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:8px}
 .ad-top-fixed{position:fixed; top:0; left:0; right:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
-.ad-inner{width:100%; max-width:420px; height:100%; display:flex; align-items:center; justify-content:center; padding:0 14px}
+.ad-inner{width:100%; max-width:var(--app-w); height:100%; display:flex; align-items:center; justify-content:center; padding:0 14px}
 .ad-infeed{display:flex; align-items:center; justify-content:center; background:#0f1418; border:1px dashed #133d36; color:#89afa6; border-radius:12px; padding:10px; margin:8px 0}
 
 /* Buttons */
@@ -99,7 +99,7 @@ select{padding:10px}
 
 /* Tabbar accents */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,15,18,.9);border-top:1px solid var(--line)}
-.tabbar .inner{max-width:420px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px}
+.tabbar .inner{max-width:var(--app-w);margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px}
 .tabbar .tab{user-select:none;text-align:center;font-weight:900;color:#a4c7be;cursor:pointer}
 .tabbar .tab.active small{color:var(--mint)}
 </style>
