@@ -6,21 +6,21 @@
 <title>TNBL – Talk Now Before Look • Mobile‑first Dark (Neon Mint)</title>
 <style>
 /* ===== THEME ===== */
-:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
+:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: var(--ad-h); --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink);} 
 .container{max-width:420px; margin:0 auto; padding:14px}
 
 /* Header + Top Ad */
-header{position:sticky; top:var(--ad-h); z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
+header{position:sticky; top:var(--ad-offset); z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
 .top{display:flex; align-items:center; gap:10px; padding:12px 14px}
 .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
 .dot{width:14px; height:14px; border-radius:50%; background:var(--mint); box-shadow:0 0 24px var(--mint)}
 .spacer{flex:1}
 .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0f1418; color:var(--muted); border:1px solid var(--line); font-weight:800}
 .ad-slot{display:block; background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:8px}
-.ad-top-fixed{position:sticky; top:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
+.ad-top-fixed{position:fixed; top:0; left:0; right:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
 
 /* Buttons */
 button{font-weight:900}
@@ -94,6 +94,7 @@ select{padding:10px}
 <body>
 <!-- Ad slot ABOVE header -->
 <div id="adTop" class="container ad-slot ad-top-fixed">Ad slot (320×50 / 320×100)</div>
+<div id="adSpacer" style="height:var(--ad-h)"></div>
 <header>
   <div class="top container">
     <div class="brand"><span class="dot"></span> TNBL <span class="muted">Talk Now Before Look</span></div>
@@ -306,7 +307,12 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
 
 // ===== Boot =====
 $('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); });
-function boot(){ updateAd(); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ updateAd();
+  // Adjust header top offset and spacer based on ad visibility
+  const adVisible = localStorage.getItem('tnbl:adOff')!=='1';
+  document.documentElement.style.setProperty('--ad-offset', adVisible ? 'var(--ad-h)' : '0px');
+  const spacer=document.getElementById('adSpacer'); if(spacer){ spacer.style.height = adVisible ? getComputedStyle(document.documentElement).getPropertyValue('--ad-h') : '0px'; }
+  renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
