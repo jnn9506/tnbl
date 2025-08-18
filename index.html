@@ -45,6 +45,9 @@ main{padding:12px; padding-bottom:160px}
 .user-item:hover{background:#0d1317}
 .meta .line1{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
 .meta .line2{color:var(--muted); font-size:12px; margin-top:2px}
+.req-preview{display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--warn); border-radius:10px; background:rgba(255,209,102,.08); margin-top:6px}
+.req-preview .tag{font-size:11px; font-weight:900; color:var(--warn); letter-spacing:.2px}
+.req-preview .msg{color:var(--ink); font-weight:800}
 .chip{display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:#9ad6cc; margin:0 6px}
 .badge{display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 6px; font-size:11px; font-weight:900; border-radius:999px; background:var(--mint); color:#02110e; margin-left:6px}
 
@@ -270,7 +273,10 @@ function renderLists(){ const all=listUsers(); const act=activePeers(all); const
   const renderItem=(u)=>{ const m=ensureMeta(u.id); const thread=loadThread(u.id); const lastTs = thread.slice(-1)[0]?.ts || u.lastSeen || u.createdAt; const firstIncoming = thread.find(x=>x.from===u.id)?.content; const stateChip = m.accepted ? '<span class="chip">CHATTING</span>' : (m.requested ? '<span class="chip" style="border-color:#59f; color:#59f">REQUESTED</span>' : '<span class="chip" style="border-color:#ffd166; color:#ffd166">PENDING</span>');
     const badge = (m.unread>0)?`<span class="badge">${m.unread}</span>`:''; 
     const li=document.createElement('li'); li.className='user-item';
-    li.innerHTML=`<div class="meta"><div class="line1"><strong>${u.name}</strong> ${stateChip}${badge}<span class="muted">• ${u.age} • ${u.gender} • ${u.state}</span></div><div class="line2">${(!m.accepted && !m.requested && firstIncoming)?`request: ${escapeHtml(firstIncoming.slice(0,30))} • `:''}last seen: ${timeAgo(lastTs)}</div></div>`;
+    const reqPreview = (!m.accepted && !m.requested && firstIncoming)
+      ? `<div class="req-preview"><span class="tag">REQUEST</span><span class="msg">${escapeHtml(firstIncoming.slice(0,30))}</span></div>`
+      : '';
+    li.innerHTML=`<div class="meta"><div class="line1"><strong>${u.name}</strong> ${stateChip}${badge}<span class="muted">• ${u.age} • ${u.gender} • ${u.state}</span></div><div class="line2">last seen: ${timeAgo(lastTs)}</div>${reqPreview}</div>`;
     const btns=document.createElement('div'); btns.className='row';
     if(!m.accepted && !m.requested){ const acc=document.createElement('button'); acc.className='btn mint sm'; acc.textContent='Accept'; acc.addEventListener('click',(e)=>{e.stopPropagation(); acceptChat(u.id);}); btns.appendChild(acc); const rej=document.createElement('button'); rej.className='btn ghost sm'; rej.textContent='Reject'; rej.addEventListener('click',(e)=>{e.stopPropagation(); rejectIncoming(u.id);}); btns.appendChild(rej); }
     if(!m.accepted && m.requested){ const cancel=document.createElement('button'); cancel.className='btn ghost sm'; cancel.textContent='Cancel'; cancel.addEventListener('click',(e)=>{e.stopPropagation(); cancelRequest(u.id);}); btns.appendChild(cancel); }
