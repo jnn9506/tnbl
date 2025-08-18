@@ -13,7 +13,7 @@ body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, 
 .container{max-width:420px; margin:0 auto; padding:14px}
 
 /* Header + Top Ad */
-header{position:sticky; top:var(--ad-offset); z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
+header{position:sticky; top:0; z-index:30; backdrop-filter: blur(8px); background:rgba(11,15,18,.9); border-bottom:1px solid var(--line)}
 .top{display:flex; align-items:center; gap:10px; padding:12px 14px}
 .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
 .dot{width:14px; height:14px; border-radius:50%; background:var(--mint); box-shadow:0 0 24px var(--mint)}
@@ -101,11 +101,8 @@ select{padding:10px}
 </style>
 </head>
 <body>
-<!-- Fixed top ad (full-width anchor, centered inner) -->
-<div id="adTop" class="ad-slot ad-top-fixed"><div class="ad-inner">Ad (320×50 / 320×100)</div></div>
-<div id="adSpacer" style="height:var(--ad-h)"></div>
-
 <header>
+  <div id="adTop" class="ad-slot"><div class="ad-inner">Ad (320×50 / 320×100)</div></div>
   <div class="top container">
     <div class="brand"><span class="dot"></span> TNBL <span class="muted">Talk Now Before Look</span></div>
     <div class="spacer"></div>
@@ -312,11 +309,9 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Ads (device scoped) =====
-function setAdOffsets(off){ const adVisible = !off; document.documentElement.style.setProperty('--ad-offset', adVisible ? 'var(--ad-h)' : '0px'); const spacer=document.getElementById('adSpacer'); if(spacer){ spacer.style.height = adVisible ? getComputedStyle(document.documentElement).getPropertyValue('--ad-h') : '0px'; } }
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; const adEl=$('#adState'); if(adEl) adEl.textContent = off ? 'OFF' : 'ON';
   // Hide both fixed and in-feed ads when off
   document.querySelectorAll('.ad-slot, .ad-infeed').forEach(el=>{ el.style.display = off ? 'none' : ''; });
-  setAdOffsets(off);
   const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
@@ -364,7 +359,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-function boot(){ updateAd(); setAdOffsets(localStorage.getItem('tnbl:adOff')==='1'); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ updateAd(); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
