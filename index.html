@@ -21,6 +21,10 @@ header{position:sticky; top:var(--ad-offset); z-index:30; backdrop-filter: blur(
 .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0f1418; color:var(--ink); border:1px solid var(--line); font-weight:800}
 .ad-slot{display:block; background:#0f1418; border:1px dashed #133d36; color:#89afa6; text-align:center; border-radius:12px; padding:8px}
 .ad-top-fixed{position:fixed; top:0; left:0; right:0; z-index:40; height:var(--ad-h); display:flex; align-items:center; justify-content:center}
+.ad-top-anchor{min-height:50px}
+.ad-rect{aspect-ratio: 300 / 250; max-width:300px; min-height:250px; width:100%; margin:0 auto}
+.ad-banner{height:50px}
+.ad-infeed{aspect-ratio: 300 / 250; max-width:300px; min-height:250px; width:100%; margin:6px auto}
 
 /* Buttons */
 button{font-weight:900}
@@ -105,7 +109,7 @@ select{padding:10px}
 </head>
 <body>
 <!-- Ad slot ABOVE header -->
-<div id="adTop" class="container ad-slot ad-top-fixed">Ad slot (320×50 / 320×100)</div>
+<div id="adTop" class="container ad-slot ad-top-fixed ad-top-anchor">Ad (320×50 / 320×100)</div>
 <div id="adSpacer" style="height:var(--ad-h)"></div>
 <header>
   <div class="top container">
@@ -151,7 +155,7 @@ select{padding:10px}
         <button id="fClear" class="btn ghost sm">Clear</button>
       </div>
     </div>
-    <div id="adMid" class="ad-slot" style="height:260px; margin-bottom:10px">Ad slot (300×250)</div>
+    <div id="adMid" class="ad-slot ad-rect" style="margin-bottom:10px">Ad (300×250)</div>
     <div id="listWrap" class="list-wrap"><ul id="userList" style="list-style:none; margin:0; padding:0"></ul></div>
   </section>
 
@@ -163,7 +167,7 @@ select{padding:10px}
     </div>
     <div class="chat">
       <div id="log" class="chat-log"></div>
-      <div id="adChat" class="ad-slot" style="height:60px">Ad slot (320×50)</div>
+      <div id="adChat" class="ad-slot ad-banner">Ad (320×50)</div>
       <div class="composer"><input id="msg" placeholder="Type a message…" maxlength="240"/><button id="send" class="btn mint">Send</button></div>
     </div>
   </section>
