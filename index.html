@@ -24,11 +24,11 @@ header{position:sticky; top:var(--ad-offset); z-index:30; backdrop-filter: blur(
 
 /* Buttons */
 button{font-weight:900}
-.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:auto; padding:10px 14px; border-radius:14px; border:1px solid var(--line); background:#0f1418; color:var(--ink); cursor:pointer; box-shadow:var(--shadow); transition:transform 120ms var(--ease-spring), background 160ms}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:auto; padding:10px 14px; border-radius:14px; border:1px solid var(--line); background:#0f1418; color:#var(--ink); cursor:pointer; box-shadow:var(--shadow); transition:transform 120ms var(--ease-spring), background 160ms}
 .btn:active{transform:scale(.95)}
 .btn.mint{background:var(--mint); color:#02110e; border-color:transparent}
 .btn.mint:hover{background:var(--mint-2)}
-.btn.ghost{background:#0f1418; color:var(--ink)}
+.btn.ghost{background:#0f1418; color:#var(--ink)}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px}
@@ -86,9 +86,11 @@ select{padding:10px}
 .list-wrap::-webkit-scrollbar, .chat-log::-webkit-scrollbar{width:0;height:0}
 
 /* Tabbar accents */
-.tabbar .tab{user-select:none}
-.tabbar .tab small{color:#a4c7be}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,15,18,.9);border-top:1px solid var(--line)}
+.tabbar .inner{max-width:420px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px}
+.tabbar .tab{user-select:none;text-align:center;font-weight:900;color:#a4c7be;cursor:pointer}
 .tabbar .tab.active small{color:var(--mint)}
+
 </style>
 </head>
 <body>
@@ -99,11 +101,22 @@ select{padding:10px}
   <div class="top container">
     <div class="brand"><span class="dot"></span> TNBL <span class="muted">Talk Now Before Look</span></div>
     <div class="spacer"></div>
-    <span class="pill" id="seedBtn">Seed 20</span>
+    <span class="pill" id="adminToggle">Dev</span>
     <span class="pill">Ads: <strong id="adState">ON</strong></span>
   </div>
 </header>
 <main class="container">
+  <!-- Admin (foldable) -->
+  <div id="adminPanel" class="card" style="display:none; margin-bottom:10px">
+    <div class="title" style="margin-bottom:8px">Admin / QA</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button id="seedBtn" class="btn mint">Seed 20 users</button>
+      <button id="clearBtn" class="btn ghost">Clear users</button>
+      <button id="toggleAdBtn" class="btn ghost">Ad OFF</button>
+      <button id="seedActivityBtn" class="btn ghost">Seed activity</button>
+    </div>
+  </div>
+
   <!-- ACTIVE -->
   <section id="screenActive" class="screen active">
     <div class="card" style="margin-bottom:10px">
@@ -156,15 +169,25 @@ select{padding:10px}
         <div class="row"><button id="buyRemoveAds" class="btn mint" type="button">Remove Ads – $1 (demo)</button></div>
       </form>
     </div>
+    <div class="card" style="margin-top:10px">
+      <div class="title">Legal & Version</div>
+      <div class="muted" style="font-size:12px; margin-top:6px; line-height:1.5">
+        TNBL is intended for users aged 18+ in the United States. By using this service, you agree to our Terms and Privacy. Practice safety: do not share sensitive info, meet in public places, and report suspicious behavior.
+        <div style="margin-top:6px">
+          • Terms of Service • Privacy Policy • Safety Tips • Community Guidelines • Report • DMCA • Contact: support@tnbl.example
+        </div>
+        <div style="margin-top:6px">© 2025 TNBL. All rights reserved. Version: <strong id="appVersion">v1.10.001</strong></div>
+      </div>
+    </div>
   </section>
 </main>
 
 <!-- TABBAR NAVIGATION (text-only) -->
-<nav class="tabbar" style="position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,15,18,.9);border-top:1px solid var(--line)">
-  <div class="inner" style="max-width:420px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px">
-    <div class="tab active" data-tab="#screenActive" style="text-align:center;font-weight:900;color:#a4c7be;cursor:pointer"><small>Active</small><span id="navBadgeActive" class="nav-badge" style="display:none;margin-left:6px;background:var(--mint);color:#02110e;padding:0 6px;border-radius:999px;min-width:18px;height:18px;line-height:18px;font-size:11px">0</span></div>
-    <div class="tab" data-tab="#screenDiscover" style="text-align:center;font-weight:900;color:#a4c7be;cursor:pointer"><small>Discover</small></div>
-    <div class="tab" data-tab="#screenSettings" style="text-align:center;font-weight:900;color:#a4c7be;cursor:pointer"><small>Profile</small></div>
+<nav class="tabbar">
+  <div class="inner">
+    <div class="tab active" data-tab="#screenActive"><small>Active</small><span id="navBadgeActive" class="nav-badge" style="display:none;margin-left:6px;background:var(--mint);color:#02110e;padding:0 6px;border-radius:999px;min-width:18px;height:18px;line-height:18px;font-size:11px">0</span></div>
+    <div class="tab" data-tab="#screenDiscover"><small>Discover</small></div>
+    <div class="tab" data-tab="#screenSettings"><small>Profile</small></div>
   </div>
 </nav>
 
@@ -174,6 +197,7 @@ select{padding:10px}
     <h3>Send chat request</h3>
     <div class="hint">First message (max 30 chars). Chat opens after they accept.</div>
     <textarea id="reqText" rows="2" maxlength="30" placeholder="Say hi…" style="width:100%; margin:6px 0"></textarea>
+    <div class="muted" style="font-size:11px; text-align:right"><span id="reqCount">0</span>/30</div>
     <div class="row"><button id="reqSend" class="btn mint" type="button">Send request</button><button id="reqCancel" class="btn ghost" type="button">Cancel</button></div>
   </div>
 </div>
@@ -223,9 +247,10 @@ function filterUsers(users, f){ return users.filter(u=>{ if(f.gender && u.gender
 
 // ===== Request UI =====
 let requestPeer=null;
-function openRequest(user){ requestPeer=user; $('#reqText').value=''; $('#requestModal').style.display='flex'; }
+function openRequest(user){ requestPeer=user; $('#reqText').value=''; const c=$('#reqCount'); if(c) c.textContent='0'; $('#requestModal').style.display='flex'; }
 function closeRequest(){ $('#requestModal').style.display='none'; requestPeer=null; }
 $('#reqCancel').addEventListener('click',closeRequest);
+$('#reqText').addEventListener('input',()=>{ const v=$('#reqText').value||''; const c=$('#reqCount'); if(c) c.textContent=String(v.length); });
 $('#reqSend').addEventListener('click',()=>{ const t=$('#reqText').value.trim(); if(!requestPeer) return; if(!t){ alert('Please write a short message (≤30).'); return;} if(t.length>30){ alert('Must be ≤ 30 chars.'); return;} sendMessage(requestPeer.id,t); const m=ensureMeta(requestPeer.id); m.accepted=false; m.requested=true; setMeta(requestPeer.id,m); closeRequest(); selectTab('#screenActive'); renderLists(); updateNavBadges(); alert('Request sent. Wait for acceptance.'); });
 
 // ===== Drag-to-scroll =====
@@ -267,11 +292,19 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Ads (device scoped) =====
-function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; const adEl=$('#adState'); if(adEl) adEl.textContent = off ? 'OFF' : 'ON'; $$('.ad-slot').forEach(el=>{ el.style.display = off ? 'none' : 'block'; }); }
+function setAdOffsets(off){ const adVisible = !off; document.documentElement.style.setProperty('--ad-offset', adVisible ? 'var(--ad-h)' : '0px'); const spacer=document.getElementById('adSpacer'); if(spacer){ spacer.style.height = adVisible ? getComputedStyle(document.documentElement).getPropertyValue('--ad-h') : '0px'; } }
+function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; const adEl=$('#adState'); if(adEl) adEl.textContent = off ? 'OFF' : 'ON'; $$('.ad-slot').forEach(el=>{ el.style.display = off ? 'none' : 'block'; }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
 function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right'; next.classList.add('active','anim'); current?.classList.add('anim'); if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); } setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right'); next.classList.remove('anim','slide-in-left','slide-in-right'); },260); $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
+
+// Admin panel
+$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ p.style.display = (p.style.display==='none'||!p.style.display)?'block':'none'; }});
+$('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); renderLists(); });
+$('#clearBtn').addEventListener('click',()=>{ clearUsers(); renderLists(); });
+$('#toggleAdBtn').addEventListener('click',()=>{ const off = localStorage.getItem('tnbl:adOff')==='1'; localStorage.setItem('tnbl:adOff', off ? '0' : '1'); updateAd(); });
+$('#seedActivityBtn').addEventListener('click',()=>{ seedActivityDummies(); renderLists(); });
 
 // Profile form
 $('#settingsForm').addEventListener('submit',(e)=>{ e.preventDefault(); const p={ name:$('#meName').value.trim(), gender:$('#meGender').value, age:Number($('#meAge').value||0), state:$('#meState').value, bio:$('#meBio').value.trim() }; const v=validateProfile(p); if(!v.ok){ alert(v.msg); return; } saveMe(p); selectTab('#screenDiscover'); renderLists(); });
@@ -306,15 +339,8 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-$('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); });
-function boot(){ updateAd();
-  // Adjust header top offset and spacer based on ad visibility
-  const adVisible = localStorage.getItem('tnbl:adOff')!=='1';
-  document.documentElement.style.setProperty('--ad-offset', adVisible ? 'var(--ad-h)' : '0px');
-  const spacer=document.getElementById('adSpacer'); if(spacer){ spacer.style.height = adVisible ? getComputedStyle(document.documentElement).getPropertyValue('--ad-h') : '0px'; }
-  renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ updateAd(); setAdOffsets(localStorage.getItem('tnbl:adOff')==='1'); renderLists(); selectTab('#screenDiscover'); seedActivityDummies(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
 </html>
-
