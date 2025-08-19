@@ -79,8 +79,9 @@ select{padding:10px}
 .composer input::placeholder{color:#6f9189}
 
 /* Ensure chat UI is only visible when Chat screen is active */
-.chat-log, #screenChat .composer{display:none !important}
-#screenChat.active .chat-log, #screenChat.active .composer{display:flex !important}
+#screenChat .chat-log, #screenChat .composer{display:none !important}
+#screenChat.active .chat-log{display:block !important}
+#screenChat.active .composer{display:flex !important}
 
 /* Animations */
 @keyframes popIn{0%{opacity:0;transform:translateY(6px) scale(.95)}100%{opacity:1;transform:none}}
