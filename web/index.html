@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <base href="/">
+    <base href="/tnbl/">
     <meta charset="UTF-8" />
     <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
     <meta name="description" content="TNBL Flutter Web" />
@@ -13,14 +13,7 @@
       html, body { height: 100%; margin: 0; background: #0b0f12; }
       #flutter_target { height: 100%; }
     </style>
-    <script>
-      const isProjectPage = location.pathname.split('/').filter(Boolean).length >= 2;
-      if (isProjectPage) {
-        const repo = location.pathname.split('/').filter(Boolean)[0];
-        const base = document.querySelector('base');
-        base.setAttribute('href', `/${repo}/`);
-      }
-    </script>
+    
   </head>
   <body>
     <script src="flutter.js" defer></script>

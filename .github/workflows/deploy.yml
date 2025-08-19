@@ -38,6 +38,10 @@ jobs:
         run: | 
           touch build/web/.nojekyll
 
+      - name: Add 404.html for SPA routing
+        run: |
+          cp build/web/index.html build/web/404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
