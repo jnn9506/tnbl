@@ -52,8 +52,8 @@ main{padding:12px; padding-bottom:0; position:relative; display:grid}
 /* Lists */
 .list-wrap{height:56vh; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); background:#0f1418}
 #screenActive .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) - var(--active-top-h) - var(--container-vpad))}
-#screenDiscover .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) - var(--discover-top-h) - var(--container-vpad))}
-#listWrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) - var(--discover-top-h) - var(--container-vpad))}
+#screenDiscover .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) + var(--discover-top-h) - var(--container-vpad))}
+#listWrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) + var(--discover-top-h) - var(--container-vpad))}
 .user-item{display:flex; justify-content:space-between; gap:10px; padding:12px; border-bottom:1px solid var(--line); position:relative; transition:background 160ms; flex-wrap:wrap; align-items:flex-start}
 .user-item:hover{background:#0d1317}
 .meta .line1{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
