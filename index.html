@@ -342,7 +342,11 @@ function setAdOffsets(off){ /* body no longer shifts for ads */ document.documen
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
+let __tabTimer=null;
 function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings','#screenChat']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||'');
+  // Hard reset any previous transition remnants to avoid multiple screens showing
+  if(__tabTimer){ clearTimeout(__tabTimer); __tabTimer=null; }
+  document.querySelectorAll('.screen').forEach(s=>{ if(s!==current){ s.classList.remove('leaving','anim','stack','slide-in-left','slide-in-right','slide-out-left','slide-out-right','pre-enter-left','pre-enter-right','active'); } });
   // Pre-render to avoid empty layouts
   if(id==='#screenActive' || id==='#screenDiscover'){ renderLists(); }
   // Layer with CSS grid so padding is preserved
@@ -353,10 +357,11 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
   // Simple cross-fade to avoid any translate interfering with padding
   next.classList.add('slide-in-right');
   current?.classList.add('slide-out-left');
-  setTimeout(()=>{ current?.classList.remove('anim','slide-out-left','slide-out-right','stack','leaving'); next.classList.remove('anim','slide-in-left','slide-in-right','stack','pre-enter-left','pre-enter-right'); },260);
+  __tabTimer = setTimeout(()=>{ current?.classList.remove('anim','slide-out-left','slide-out-right','stack','leaving'); next.classList.remove('anim','slide-in-left','slide-in-right','stack','pre-enter-left','pre-enter-right'); __tabTimer=null; },260);
   $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
   // Toggle app state for chat to hide tabbar and reduce bottom padding
-  if(id==='#screenChat'){ document.documentElement.classList.add('chatting'); document.body.classList.add('chatting'); } else { document.documentElement.classList.remove('chatting'); document.body.classList.remove('chatting'); }
+  if(id==='#screenChat'){ document.documentElement.classList.add('chatting'); document.body.classList.add('chatting'); }
+  if(id!=='#screenChat'){ document.documentElement.classList.remove('chatting'); document.body.classList.remove('chatting'); }
   if(id==='#screenSettings'){ populateProfileForm(); }
 }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
