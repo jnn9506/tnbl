@@ -347,6 +347,7 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Layout recompute (ads/admin/headers/filters/tabbar) =====
+function getNaturalHeight(el){ if(!el) return 0; const cs=getComputedStyle(el); const prev={ display: el.style.display, position: el.style.position, visibility: el.style.visibility, maxHeight: el.style.maxHeight }; let h=0; if(cs.display==='none'){ el.style.visibility='hidden'; el.style.position='absolute'; el.style.display='block'; el.style.maxHeight='none'; h=el.scrollHeight; } else { const prevMax=el.style.maxHeight; el.style.maxHeight='none'; h=el.scrollHeight; el.style.maxHeight=prevMax; } el.style.display=prev.display; el.style.position=prev.position; el.style.visibility=prev.visibility; el.style.maxHeight=prev.maxHeight; return h; }
 function recomputeLayout(){
   // Top ad height
   const adOff = localStorage.getItem('tnbl:adOff')==='1';
@@ -359,6 +360,11 @@ function recomputeLayout(){
   const adminOpen=admin && admin.style.display==='block';
   const adminH=adminOpen?(()=>{ const cs=getComputedStyle(admin); const mb=parseFloat(cs.marginBottom)||0; return (admin.getBoundingClientRect().height+mb)+'px'; })():'0px';
   document.documentElement.style.setProperty('--admin-h', adminH);
+  // Ensure expanded filtersWrap tracks its content height on resize
+  const wrap=document.getElementById('filtersWrap');
+  if(wrap && !wrap.classList.contains('collapsed')){
+    wrap.style.maxHeight = getNaturalHeight(wrap) + 'px';
+  }
   // Tabbar height
   const tb=document.querySelector('.tabbar');
   const tbH=tb?(()=>{ const rect=tb.getBoundingClientRect(); const cs=getComputedStyle(tb); const mt=parseFloat(cs.marginTop)||0; const mb=parseFloat(cs.marginBottom)||0; return (rect.height+mt+mb)+'px'; })():'0px';
@@ -420,7 +426,7 @@ function toggleFilters(){ const wrap=document.getElementById('filtersWrap'); con
   // Recompute after transition completes for accurate height
   wrap.addEventListener('transitionend', function onEnd(e){ if(e.propertyName==='max-height'){ wrap.removeEventListener('transitionend', onEnd); recomputeLayout(); } }, { once:true });
 }
-document.getElementById('filterToggleBtn')?.addEventListener('click', ()=>{ toggleFilters(); setTimeout(recomputeLayout, 0); });
+document.getElementById('filterToggleBtn')?.addEventListener('click', ()=>{ toggleFilters(); const wrap=document.getElementById('filtersWrap'); if(wrap){ wrap.addEventListener('transitionend', function onEnd(e){ if(e.propertyName==='max-height'){ wrap.removeEventListener('transitionend', onEnd); recomputeLayout(); } }, { once:true }); } else { setTimeout(recomputeLayout, 0); } });
 
 // Chat binds
 $('#backBtn').addEventListener('click',()=>{ selectTab('#screenActive'); renderLists(); updateNavBadges(); });
