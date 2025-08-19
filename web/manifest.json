@@ -1,0 +1,11 @@
+{
+  "name": "TNBL",
+  "short_name": "TNBL",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b0f12",
+  "theme_color": "#0b0f12",
+  "description": "TNBL Flutter Web",
+  "icons": []
+}
+
