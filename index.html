@@ -36,7 +36,7 @@ button{font-weight:900}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px; position:relative; display:grid}
-.chatting main{padding-bottom:12px}
+.chatting main{padding-bottom:0}
 .screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
 .screen.leaving{pointer-events:none}
@@ -344,7 +344,20 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Ads (device scoped) =====
-function setAdOffsets(off){ const topAd = document.getElementById('adTop'); const px = (!off && topAd && topAd.style.display!=='none') ? getComputedStyle(topAd).height : '0px'; document.documentElement.style.setProperty('--ad-offset', px); }
+function recomputeChatLayout(){
+  // Recompute admin height
+  const p=document.getElementById('adminPanel');
+  const isOpen = p && p.style.display==='block';
+  const adminHeight = isOpen ? (p.getBoundingClientRect().height + 10) : 0;
+  document.documentElement.style.setProperty('--admin-h', adminHeight+'px');
+  // Recompute ad offset
+  const topAd=document.getElementById('adTop');
+  const adVisible = topAd && getComputedStyle(topAd).display !== 'none';
+  const adPx = adVisible ? getComputedStyle(topAd).height : '0px';
+  document.documentElement.style.setProperty('--ad-offset', adPx);
+}
+
+function setAdOffsets(off){ const topAd = document.getElementById('adTop'); const px = (!off && topAd && topAd.style.display!=='none') ? getComputedStyle(topAd).height : '0px'; document.documentElement.style.setProperty('--ad-offset', px); recomputeChatLayout(); }
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
@@ -373,7 +386,7 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
-$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; const adminHeight = open ? (p.getBoundingClientRect().height + 10) : 0; document.documentElement.style.setProperty('--admin-h', adminHeight+'px'); }});
+$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; recomputeChatLayout(); }});
 $('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); renderLists(); });
 $('#clearBtn').addEventListener('click',()=>{ clearUsers(); renderLists(); });
 $('#toggleAdBtn').addEventListener('click',()=>{ const off = localStorage.getItem('tnbl:adOff')==='1'; localStorage.setItem('tnbl:adOff', off ? '0' : '1'); updateAd(); });
@@ -418,7 +431,13 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
 
 // ===== Boot =====
 function boot(){ if(__booted) return; __booted = true; document.body.classList.remove('preload'); updateAd(); seedActivityDummies(); applyFiltersCollapsedState(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
-document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('preload'); requestAnimationFrame(()=>boot()); });
+document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('preload'); requestAnimationFrame(()=>boot()); 
+  // Recompute chat layout on resize/orientation change and admin/ad mutations
+  window.addEventListener('resize', recomputeChatLayout);
+  const obs=new MutationObserver(()=>recomputeChatLayout());
+  const admin=document.getElementById('adminPanel'); if(admin) obs.observe(admin,{attributes:true,attributeFilter:['style','class']});
+  const ad=document.getElementById('adTop'); if(ad) obs.observe(ad,{attributes:true,attributeFilter:['style','class']});
+});
 </script>
 </body>
 </html>
