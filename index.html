@@ -357,17 +357,16 @@ function recomputeLayout(){
   // Admin panel height
   const admin=document.getElementById('adminPanel');
   const adminOpen=admin && admin.style.display==='block';
-  const adminH=adminOpen?(admin.getBoundingClientRect().height+10)+'px':'0px';
+  const adminH=adminOpen?(()=>{ const cs=getComputedStyle(admin); const mb=parseFloat(cs.marginBottom)||0; return (admin.getBoundingClientRect().height+mb)+'px'; })():'0px';
   document.documentElement.style.setProperty('--admin-h', adminH);
   // Tabbar height
-  const tb=document.querySelector('.tabbar .inner');
-  const tbH=tb?getComputedStyle(tb).height:'0px';
+  const tb=document.querySelector('.tabbar');
+  const tbH=tb?(()=>{ const rect=tb.getBoundingClientRect(); const cs=getComputedStyle(tb); const mt=parseFloat(cs.marginTop)||0; const mb=parseFloat(cs.marginBottom)||0; return (rect.height+mt+mb)+'px'; })():'0px';
   document.documentElement.style.setProperty('--tabbar-h', tbH);
   // Top cards (Active/Discover) including filter area
-  const aTop=document.querySelector('#screenActive .card');
-  const dTop=document.querySelector('#screenDiscover .card');
-  document.documentElement.style.setProperty('--active-top-h', aTop?(aTop.getBoundingClientRect().height+10)+'px':'0px');
-  document.documentElement.style.setProperty('--discover-top-h', dTop?(dTop.getBoundingClientRect().height+10)+'px':'0px');
+  const calcTop=(sel)=>{ const el=document.querySelector(sel); if(!el) return '0px'; const rect=el.getBoundingClientRect(); const cs=getComputedStyle(el); const mb=parseFloat(cs.marginBottom)||0; const mt=parseFloat(cs.marginTop)||0; return (rect.height+mt+mb)+'px'; };
+  document.documentElement.style.setProperty('--active-top-h', calcTop('#screenActive .card'));
+  document.documentElement.style.setProperty('--discover-top-h', calcTop('#screenDiscover .card'));
 }
 
 // Ads update hooks
