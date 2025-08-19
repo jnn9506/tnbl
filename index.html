@@ -78,6 +78,10 @@ select{padding:10px}
 .composer input{flex:1; padding:10px; border-radius:12px; border:1px solid var(--line); background:#0f1418; color:#var(--ink)}
 .composer input::placeholder{color:#6f9189}
 
+/* Ensure chat UI is only visible when Chat screen is active */
+.chat-log, #screenChat .composer{display:none}
+#screenChat.active .chat-log, #screenChat.active .composer{display:flex}
+
 /* Animations */
 @keyframes popIn{0%{opacity:0;transform:translateY(6px) scale(.95)}100%{opacity:1;transform:none}}
 @keyframes flashIn{0%{box-shadow:0 0 0 0 rgba(0,245,212,0)}30%{box-shadow:0 0 0 8px rgba(0,245,212,.12)}100%{box-shadow:0 0 0 0 rgba(0,245,212,0)}}
