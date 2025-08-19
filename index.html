@@ -34,7 +34,7 @@ button{font-weight:900}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px; position:relative}
-.screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
 .screen.stack{position:absolute; inset:0}
 .screen.active{display:block; opacity:1; transform:translateX(0)}
@@ -86,12 +86,12 @@ select{padding:10px}
 
 /* Slide transitions for tabs */
 .screen.anim{transition:transform 260ms var(--ease-spring), opacity 260ms var(--ease-spring)}
-.slide-in-left{opacity:1; transform:translateX(0)}
-.slide-in-right{opacity:1; transform:translateX(0)}
-.pre-enter-left{opacity:0; transform:translateX(-24px)}
-.pre-enter-right{opacity:0; transform:translateX(24px)}
-.slide-out-left{opacity:0; transform:translateX(-24px)}
-.slide-out-right{opacity:0; transform:translateX(24px)}
+.slide-in-left{opacity:1; transform:translate3d(0,0,0)}
+.slide-in-right{opacity:1; transform:translate3d(0,0,0)}
+.pre-enter-left{opacity:0; transform:translate3d(-24px,0,0)}
+.pre-enter-right{opacity:0; transform:translate3d(24px,0,0)}
+.slide-out-left{opacity:0; transform:translate3d(-24px,0,0)}
+.slide-out-right{opacity:0; transform:translate3d(24px,0,0)}
 
 /* Collapsible filters */
 #filtersWrap{overflow:hidden; transition:max-height 220ms var(--ease-spring), opacity 180ms var(--ease-spring);}
