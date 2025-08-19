@@ -10,6 +10,8 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink);} 
+body{ opacity:1; transition:opacity 140ms var(--ease-spring);} 
+body.preload{ opacity:0; }
 .container{width:min(var(--app-w), 100vw); margin:0 auto; padding:14px}
 
 /* Header + Top Ad */
@@ -34,7 +36,7 @@ button{font-weight:900}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px; position:relative}
-.screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
 .screen.stack{position:absolute; inset:0}
 .screen.active{display:block; opacity:1; transform:translateX(0)}
@@ -86,12 +88,12 @@ select{padding:10px}
 
 /* Slide transitions for tabs */
 .screen.anim{transition:transform 260ms var(--ease-spring), opacity 260ms var(--ease-spring)}
-.slide-in-left{opacity:1; transform:translateX(0)}
-.slide-in-right{opacity:1; transform:translateX(0)}
-.pre-enter-left{opacity:0; transform:translateX(-24px)}
-.pre-enter-right{opacity:0; transform:translateX(24px)}
-.slide-out-left{opacity:0; transform:translateX(-24px)}
-.slide-out-right{opacity:0; transform:translateX(24px)}
+.slide-in-left{opacity:1; transform:translate3d(0,0,0)}
+.slide-in-right{opacity:1; transform:translate3d(0,0,0)}
+.pre-enter-left{opacity:0; transform:translate3d(-24px,0,0)}
+.pre-enter-right{opacity:0; transform:translate3d(24px,0,0)}
+.slide-out-left{opacity:0; transform:translate3d(-24px,0,0)}
+.slide-out-right{opacity:0; transform:translate3d(24px,0,0)}
 
 /* Collapsible filters */
 #filtersWrap{overflow:hidden; transition:max-height 220ms var(--ease-spring), opacity 180ms var(--ease-spring);}
@@ -397,8 +399,8 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-function boot(){ if(__booted) return; __booted = true; updateAd(); seedActivityDummies(); applyFiltersCollapsedState(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
-document.addEventListener('DOMContentLoaded',boot);
+function boot(){ if(__booted) return; __booted = true; document.body.classList.remove('preload'); updateAd(); seedActivityDummies(); applyFiltersCollapsedState(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('preload'); requestAnimationFrame(()=>boot()); });
 </script>
 </body>
 </html>
