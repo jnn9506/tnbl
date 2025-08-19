@@ -415,8 +415,11 @@ $('#fApply').addEventListener('click',()=>renderLists());
 $('#fClear').addEventListener('click',clearFilters);
 // Discover filters collapse
 const FILTERS_STATE_KEY='tnbl:filters:collapsed';
-function applyFiltersCollapsedState(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const collapsed = localStorage.getItem(FILTERS_STATE_KEY)==='1'; if(collapsed){ wrap.classList.add('collapsed'); wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; } else { wrap.classList.remove('collapsed'); wrap.style.maxHeight='400px'; btn.textContent='Filters ▾'; } }
-function toggleFilters(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const isCollapsed=wrap.classList.toggle('collapsed'); if(isCollapsed){ wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; localStorage.setItem(FILTERS_STATE_KEY,'1'); } else { wrap.style.maxHeight='400px'; btn.textContent='Filters ▾'; localStorage.setItem(FILTERS_STATE_KEY,'0'); } }
+function applyFiltersCollapsedState(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const collapsed = localStorage.getItem(FILTERS_STATE_KEY)==='1'; if(collapsed){ wrap.classList.add('collapsed'); wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; } else { wrap.classList.remove('collapsed'); wrap.style.maxHeight=wrap.scrollHeight+'px'; btn.textContent='Filters ▾'; } }
+function toggleFilters(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const isCollapsed=wrap.classList.toggle('collapsed'); if(isCollapsed){ wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; localStorage.setItem(FILTERS_STATE_KEY,'1'); } else { wrap.style.maxHeight=wrap.scrollHeight+'px'; btn.textContent='Filters ▾'; localStorage.setItem(FILTERS_STATE_KEY,'0'); }
+  // Recompute after transition completes for accurate height
+  wrap.addEventListener('transitionend', function onEnd(e){ if(e.propertyName==='max-height'){ wrap.removeEventListener('transitionend', onEnd); recomputeLayout(); } }, { once:true });
+}
 document.getElementById('filterToggleBtn')?.addEventListener('click', ()=>{ toggleFilters(); setTimeout(recomputeLayout, 0); });
 
 // Chat binds
