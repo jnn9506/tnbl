@@ -36,6 +36,7 @@ button{font-weight:900}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px; position:relative; display:grid}
+.chatting main{padding-bottom:12px}
 .screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
 .screen.leaving{pointer-events:none}
@@ -64,7 +65,8 @@ input::placeholder,textarea::placeholder{color:#6f9189}
 select{padding:10px}
 
 /* Chat */
-.chat{display:grid; grid-template-rows: auto 1fr auto; height:65vh; gap:10px}
+#screenChat{display:flex; flex-direction:column; min-height:calc(100vh - var(--hdr-h) - 24px)}
+.chat{flex:1; display:grid; grid-template-rows: 1fr auto; height:auto; gap:10px; min-height:0}
 .chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:12px; background:linear-gradient(180deg,#0f161b,#0b0f12)}
 .bub{display:inline-block; max-width:75%; min-width:36px; width:auto; padding:8px 10px; border-radius:14px; margin:8px 0 6px; line-height:1.35; font-weight:600; white-space:pre-wrap; word-break:break-word}
 .bub.cont{margin-top:3px}
@@ -115,6 +117,7 @@ select{padding:10px}
 
 /* Tabbar accents */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(11,15,18,.9);border-top:1px solid var(--line)}
+.chatting .tabbar{display:none}
 .tabbar .inner{max-width:var(--app-w);margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 12px}
 .tabbar .tab{user-select:none;text-align:center;font-weight:900;color:#a4c7be;cursor:pointer}
 .tabbar .tab.active small{color:var(--mint)}
@@ -324,7 +327,7 @@ function renderLists(){ const all=listUsers(); const act=activePeers(all); const
 }
 
 // ===== UI: Chat =====
-let currentPeer=null; function openChat(user){ const m=ensureMeta(user.id); if(!m.accepted){ alert('Accept first to open the chat.'); return; } currentPeer=user; m.unread=0; m.lastReadTs=Date.now(); setMeta(user.id,m); $('#chatName').textContent=user.name; $('#chatMeta').textContent=`${user.age} • ${user.gender} • ${user.state}`; renderChat(); show('#screenChat'); updateNavBadges(); }
+let currentPeer=null; function openChat(user){ const m=ensureMeta(user.id); if(!m.accepted){ alert('Accept first to open the chat.'); return; } currentPeer=user; m.unread=0; m.lastReadTs=Date.now(); setMeta(user.id,m); $('#chatName').textContent=user.name; $('#chatMeta').textContent=`${user.age} • ${user.gender} • ${user.state}`; renderChat(); selectTab('#screenChat'); updateNavBadges(); }
 function renderChat(){ const log=$('#log'); log.innerHTML=''; if(!currentPeer){ return; } const msgs=loadThread(currentPeer.id); msgs.forEach((m, idx)=>{ const div=document.createElement('div'); div.className='bub '+(m.from===ME?'me':'them'); div.innerHTML=`${escapeHtml(m.content)}<div class=\"ts\">${timeAgo(m.ts)}</div>`; log.appendChild(div); if((idx+1)%6===0){ log.appendChild(createInfeedAdDiv()); } }); log.scrollTop=log.scrollHeight; }
 function escapeHtml(s=''){ return s.replace(/[&<>"']/g, function(c){ return c==='&'?'&amp;': c==='<'?'&lt;': c==='>'?'&gt;': c==='"'?'&quot;':'&#39;'; }); }
 
@@ -338,7 +341,7 @@ function setAdOffsets(off){ /* body no longer shifts for ads */ document.documen
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
-function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||'');
+function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings','#screenChat']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||'');
   // Pre-render to avoid empty layouts
   if(id==='#screenActive' || id==='#screenDiscover'){ renderLists(); }
   // Layer with CSS grid so padding is preserved
@@ -350,7 +353,10 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
   next.classList.add('slide-in-right');
   current?.classList.add('slide-out-left');
   setTimeout(()=>{ current?.classList.remove('anim','slide-out-left','slide-out-right','stack','leaving'); next.classList.remove('anim','slide-in-left','slide-in-right','stack','pre-enter-left','pre-enter-right'); },260);
-  $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
+  $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+  // Toggle app state for chat to hide tabbar and reduce bottom padding
+  if(id==='#screenChat'){ document.documentElement.classList.add('chatting'); document.body.classList.add('chatting'); } else { document.documentElement.classList.remove('chatting'); document.body.classList.remove('chatting'); }
+}
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
