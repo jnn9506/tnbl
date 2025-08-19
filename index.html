@@ -6,7 +6,7 @@
 <title>TNBL – Talk Now Before Look • Mobile‑first Dark (Neon Mint)</title>
 <style>
 /* ===== THEME ===== */
-:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: 0px; --app-w:420px; --composer-h:60px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
+:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: 0px; --admin-h:0px; --app-w:420px; --composer-h:60px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink);} 
@@ -65,7 +65,7 @@ input::placeholder,textarea::placeholder{color:#6f9189}
 select{padding:10px}
 
 /* Chat */
-#screenChat{flex-direction:column; height:calc(100dvh - var(--hdr-h) - 24px); min-height:0; overflow:hidden}
+#screenChat{flex-direction:column; height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - 24px); min-height:0; overflow:hidden}
 .screen.active#screenChat, #screenChat.active{display:flex}
 .chat{flex:1; display:grid; grid-template-rows: 1fr auto; height:auto; gap:10px; min-height:0}
 .chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:12px; padding-bottom:calc(12px + var(--composer-h)); background:linear-gradient(180deg,#0f161b,#0b0f12)}
@@ -81,7 +81,7 @@ select{padding:10px}
 
 /* Ensure chat UI is only visible when Chat screen is active */
 #screenChat .chat-log, #screenChat .composer{display:none !important}
-#screenChat.active .chat-log{display:block !important}
+#screenChat.active .chat-log{display:block !important; height:calc(100% - var(--composer-h) - 10px)}
 #screenChat.active .composer{display:flex !important}
 
 /* Animations */
@@ -344,7 +344,7 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Ads (device scoped) =====
-function setAdOffsets(off){ /* body no longer shifts for ads */ document.documentElement.style.setProperty('--ad-offset', '0px'); }
+function setAdOffsets(off){ const topAd = document.getElementById('adTop'); const px = (!off && topAd && topAd.style.display!=='none') ? getComputedStyle(topAd).height : '0px'; document.documentElement.style.setProperty('--ad-offset', px); }
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
@@ -373,7 +373,7 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
-$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; }});
+$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; const adminHeight = open ? (p.getBoundingClientRect().height + 10) : 0; document.documentElement.style.setProperty('--admin-h', adminHeight+'px'); }});
 $('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); renderLists(); });
 $('#clearBtn').addEventListener('click',()=>{ clearUsers(); renderLists(); });
 $('#toggleAdBtn').addEventListener('click',()=>{ const off = localStorage.getItem('tnbl:adOff')==='1'; localStorage.setItem('tnbl:adOff', off ? '0' : '1'); updateAd(); });
