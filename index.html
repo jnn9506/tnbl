@@ -35,11 +35,13 @@ button{font-weight:900}
 .btn.ghost{background:#0f1418; color:#var(--ink)}
 .btn.sm{padding:6px 8px; width:auto}
 
-main{padding:12px; padding-bottom:160px; position:relative}
+main{padding:12px; padding-bottom:160px; position:relative; display:grid}
 .screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
 .screen.leaving{pointer-events:none}
-.screen.stack{position:absolute; inset:0}
+.screen.stack{position:static; inset:auto; grid-area:1 / 1}
+.screen.active{z-index:2}
+.screen.leaving{z-index:1}
 .screen.active{display:block; opacity:1; transform:translateX(0)}
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
 .title{font-size:18px; font-weight:900}
@@ -336,21 +338,17 @@ function setAdOffsets(off){ /* body no longer shifts for ads */ document.documen
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
-function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right';
-  // Pre-render list content before animation to avoid broken UI during entry
+function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||'');
+  // Pre-render to avoid empty layouts
   if(id==='#screenActive' || id==='#screenDiscover'){ renderLists(); }
-  // Prepare stacking and states
+  // Layer with CSS grid so padding is preserved
   current?.classList.add('stack','leaving','anim');
   next.classList.add('stack','anim');
-  // Set pre-enter transform so the transition animates from off-screen
-  next.classList.add(dir==='left' ? 'pre-enter-right' : 'pre-enter-left');
-  // Activate next screen only, deactivate current (but keep leaving)
   current?.classList.remove('active');
   next.classList.add('active');
-  // Force reflow to ensure the pre-enter state applies before starting transition
-  void next.offsetWidth; void current?.offsetWidth;
-  // Run animations
-  if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); }
+  // Simple cross-fade to avoid any translate interfering with padding
+  next.classList.add('slide-in-right');
+  current?.classList.add('slide-out-left');
   setTimeout(()=>{ current?.classList.remove('anim','slide-out-left','slide-out-right','stack','leaving'); next.classList.remove('anim','slide-in-left','slide-in-right','stack','pre-enter-left','pre-enter-right'); },260);
   $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
