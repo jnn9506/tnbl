@@ -65,7 +65,7 @@ input::placeholder,textarea::placeholder{color:#6f9189}
 select{padding:10px}
 
 /* Chat */
-#screenChat{flex-direction:column; min-height:calc(100vh - var(--hdr-h) - 24px)}
+#screenChat{flex-direction:column; height:calc(100vh - var(--hdr-h) - var(--ad-offset) - 24px); min-height:0; overflow:hidden}
 .screen.active#screenChat, #screenChat.active{display:flex}
 .chat{flex:1; display:grid; grid-template-rows: 1fr auto; height:auto; gap:10px; min-height:0}
 .chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:12px; background:linear-gradient(180deg,#0f161b,#0b0f12)}
