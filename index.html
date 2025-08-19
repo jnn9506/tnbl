@@ -89,6 +89,10 @@ select{padding:10px}
 .slide-out-left{opacity:0; transform:translateX(-24px)}
 .slide-out-right{opacity:0; transform:translateX(24px)}
 
+/* Collapsible filters */
+#filtersWrap{overflow:hidden; transition:max-height 220ms var(--ease-spring), opacity 180ms var(--ease-spring);}
+#filtersWrap.collapsed{max-height:0; opacity:.0; padding-top:0;}
+
 /* Scrollbar hide */
 .list-wrap, .chat-log{scrollbar-width:none}
 .list-wrap::-webkit-scrollbar, .chat-log::-webkit-scrollbar{width:0;height:0}
@@ -142,14 +146,19 @@ select{padding:10px}
   <!-- DISCOVER -->
   <section id="screenDiscover" class="screen">
     <div class="card" style="margin-bottom:10px">
-      <div class="title">Discover</div>
-      <div class="row" style="margin-top:8px; flex-wrap:wrap">
-        <select id="fGender"><option value="">All</option><option value="M">Male</option><option value="F">Female</option></select>
-        <select id="fState"><option value="">All</option><option>CA</option><option>NY</option><option>TX</option><option>FL</option><option>WA</option><option>IL</option><option>NV</option></select>
-        <input id="fAgeMin" type="number" placeholder="18" min="18" max="99" />
-        <input id="fAgeMax" type="number" placeholder="99" min="18" max="99" />
-        <button id="fApply" class="btn mint sm">Apply</button>
-        <button id="fClear" class="btn ghost sm">Clear</button>
+      <div class="row" style="justify-content:space-between; align-items:center">
+        <div class="title">Discover</div>
+        <button id="filterToggleBtn" class="btn ghost sm" type="button">Filters ▾</button>
+      </div>
+      <div id="filtersWrap">
+        <div class="row" style="margin-top:8px; flex-wrap:wrap">
+          <select id="fGender"><option value="">All</option><option value="M">Male</option><option value="F">Female</option></select>
+          <select id="fState"><option value="">All</option><option>CA</option><option>NY</option><option>TX</option><option>FL</option><option>WA</option><option>IL</option><option>NV</option></select>
+          <input id="fAgeMin" type="number" placeholder="18" min="18" max="99" />
+          <input id="fAgeMax" type="number" placeholder="99" min="18" max="99" />
+          <button id="fApply" class="btn mint sm">Apply</button>
+          <button id="fClear" class="btn ghost sm">Clear</button>
+        </div>
       </div>
     </div>
     <div id="listWrap" class="list-wrap"><ul id="userList" style="list-style:none; margin:0; padding:0"></ul></div>
@@ -335,6 +344,11 @@ $('#buyRemoveAds').addEventListener('click',()=>{ localStorage.setItem('tnbl:adO
 // Discover filters binds
 $('#fApply').addEventListener('click',()=>renderLists());
 $('#fClear').addEventListener('click',clearFilters);
+// Discover filters collapse
+const FILTERS_STATE_KEY='tnbl:filters:collapsed';
+function applyFiltersCollapsedState(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const collapsed = localStorage.getItem(FILTERS_STATE_KEY)==='1'; if(collapsed){ wrap.classList.add('collapsed'); wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; } else { wrap.classList.remove('collapsed'); wrap.style.maxHeight='400px'; btn.textContent='Filters ▾'; } }
+function toggleFilters(){ const wrap=document.getElementById('filtersWrap'); const btn=document.getElementById('filterToggleBtn'); if(!wrap||!btn) return; const isCollapsed=wrap.classList.toggle('collapsed'); if(isCollapsed){ wrap.style.maxHeight='0px'; btn.textContent='Filters ▸'; localStorage.setItem(FILTERS_STATE_KEY,'1'); } else { wrap.style.maxHeight='400px'; btn.textContent='Filters ▾'; localStorage.setItem(FILTERS_STATE_KEY,'0'); } }
+document.getElementById('filterToggleBtn')?.addEventListener('click', toggleFilters);
 
 // Chat binds
 $('#backBtn').addEventListener('click',()=>{ selectTab('#screenActive'); renderLists(); updateNavBadges(); });
@@ -360,7 +374,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
   renderLists(); updateNavBadges(); }
 
 // ===== Boot =====
-function boot(){ if(__booted) return; __booted = true; updateAd(); seedActivityDummies(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
+function boot(){ if(__booted) return; __booted = true; updateAd(); seedActivityDummies(); applyFiltersCollapsedState(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
 </body>
