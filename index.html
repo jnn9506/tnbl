@@ -34,7 +34,8 @@ button{font-weight:900}
 .btn.sm{padding:6px 8px; width:auto}
 
 main{padding:12px; padding-bottom:160px; position:relative}
-.screen{display:none; opacity:0; transform:translateX(30px); transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen.active,.screen.leaving{display:block}
 .screen.stack{position:absolute; inset:0}
 .screen.active{display:block; opacity:1; transform:translateX(0)}
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
@@ -85,8 +86,10 @@ select{padding:10px}
 
 /* Slide transitions for tabs */
 .screen.anim{transition:transform 260ms var(--ease-spring), opacity 260ms var(--ease-spring)}
-.slide-in-left{opacity:0; transform:translateX(-24px)}
-.slide-in-right{opacity:0; transform:translateX(24px)}
+.slide-in-left{opacity:1; transform:translateX(0)}
+.slide-in-right{opacity:1; transform:translateX(0)}
+.pre-enter-left{opacity:0; transform:translateX(-24px)}
+.pre-enter-right{opacity:0; transform:translateX(24px)}
 .slide-out-left{opacity:0; transform:translateX(-24px)}
 .slide-out-right{opacity:0; transform:translateX(24px)}
 
@@ -331,12 +334,22 @@ function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.
 
 // ===== Tabbar / Binds =====
 function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right';
-  // Stack screens to avoid showing next screen under content during transition
-  current?.classList.add('stack'); next.classList.add('stack');
-  next.classList.add('active','anim'); current?.classList.add('anim');
+  // Pre-render list content before animation to avoid broken UI during entry
+  if(id==='#screenActive' || id==='#screenDiscover'){ renderLists(); }
+  // Prepare stacking and states
+  current?.classList.add('stack','leaving','anim');
+  next.classList.add('stack','anim');
+  // Set pre-enter transform so the transition animates from off-screen
+  next.classList.add(dir==='left' ? 'pre-enter-right' : 'pre-enter-left');
+  // Activate next screen only, deactivate current (but keep leaving)
+  current?.classList.remove('active');
+  next.classList.add('active');
+  // Force reflow to ensure the pre-enter state applies before starting transition
+  void next.offsetWidth; void current?.offsetWidth;
+  // Run animations
   if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); }
-  setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right','stack'); next.classList.remove('anim','slide-in-left','slide-in-right','stack'); },260);
-  $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
+  setTimeout(()=>{ current?.classList.remove('anim','slide-out-left','slide-out-right','stack','leaving'); next.classList.remove('anim','slide-in-left','slide-in-right','stack','pre-enter-left','pre-enter-right'); },260);
+  $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
