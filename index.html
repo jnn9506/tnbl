@@ -33,8 +33,9 @@ button{font-weight:900}
 .btn.ghost{background:#0f1418; color:#var(--ink)}
 .btn.sm{padding:6px 8px; width:auto}
 
-main{padding:12px; padding-bottom:160px}
+main{padding:12px; padding-bottom:160px; position:relative}
 .screen{display:none; opacity:0; transform:translateX(30px); transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring)}
+.screen.stack{position:absolute; inset:0}
 .screen.active{display:block; opacity:1; transform:translateX(0)}
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
 .title{font-size:18px; font-weight:900}
@@ -92,6 +93,9 @@ select{padding:10px}
 /* Collapsible filters */
 #filtersWrap{overflow:hidden; transition:max-height 220ms var(--ease-spring), opacity 180ms var(--ease-spring);}
 #filtersWrap.collapsed{max-height:0; opacity:.0; padding-top:0;}
+
+/* Desktop: reserve scrollbar width to prevent layout shift */
+@media (pointer: fine){ html{ overflow-y: scroll; } }
 
 /* Scrollbar hide */
 .list-wrap, .chat-log{scrollbar-width:none}
@@ -326,7 +330,13 @@ function setAdOffsets(off){ /* body no longer shifts for ads */ document.documen
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
-function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right'; next.classList.add('active','anim'); current?.classList.add('anim'); if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); } setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right'); next.classList.remove('anim','slide-in-left','slide-in-right'); },260); $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
+function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right';
+  // Stack screens to avoid showing next screen under content during transition
+  current?.classList.add('stack'); next.classList.add('stack');
+  next.classList.add('active','anim'); current?.classList.add('anim');
+  if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); }
+  setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right','stack'); next.classList.remove('anim','slide-in-left','slide-in-right','stack'); },260);
+  $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
@@ -363,7 +373,7 @@ function makeTouchable(selector){ document.querySelectorAll(selector).forEach(el
 function animateLastBubble(role){ const log=document.getElementById('log'); if(!log) return; const els=log.querySelectorAll('.bub.'+(role==='me'?'me':'them')); if(!els.length) return; const el=els[els.length-1]; el.classList.remove('pop','flash'); void el.offsetWidth; el.classList.add(role==='me'?'pop':'flash'); }
 
 // Swipe between tabs (avoid when Chat active or modal open)
-(function(){ const order=['#screenActive','#screenDiscover','#screenSettings']; let sx=0, sy=0; const TH=60; const area=document.querySelector('main'); area.addEventListener('touchstart',e=>{ if(e.touches.length!==1) return; if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true}); area.addEventListener('touchend',e=>{ if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)<TH || Math.abs(dx)<=Math.abs(dy)) return; const curTab=document.querySelector('.tab.active')?.getAttribute('data-tab')||order[0]; let i=order.indexOf(curTab); if(dx<0 && i<order.length-1) selectTab(order[i+1]); else if(dx>0 && i>0) selectTab(order[i-1]); },{passive:true});})();
+(function(){ const order=['#screenActive','#screenDiscover','#screenSettings']; let sx=0, sy=0; const TH=60; const area=document.querySelector('main'); area.addEventListener('touchstart',e=>{ if(e.touches.length!==1) return; if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; sx=e.touches[0].clientX; sy=e.touches[0].clientY; },{passive:true}); area.addEventListener('touchend',e=>{ if($('#requestModal').style.display==='flex') return; if($('#screenChat').classList.contains('active')) return; const dx=e.changedTouches[0].clientX-sx; const dy=e.changedTouches[0].clientY-sy; if(Math.abs(dx)<TH || Math.abs(dx)<=Math.abs(dy)) return; const curTab=document.querySelector('.tab.active')?.getAttribute('data-tab')||order[0]; let i=order.indexOf(curTab); if(dx<0 && i<order.length-1){ selectTab(order[i+1]); } else if(dx>0 && i>0){ selectTab(order[i-1]); } },{passive:true});})();
 
 // ===== Demo activity dummies =====
 function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ seedUsers(10); }
