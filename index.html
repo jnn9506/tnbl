@@ -254,6 +254,7 @@ const PROFILE_KEY='tnbl:me';
 function getMe(){ return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); }
 function saveMe(p){ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
 function validateProfile(p){ if(!p.name || !p.gender || !p.age || !p.state) return {ok:false,msg:'Please fill all fields (18+).'}; if(p.age<18) return {ok:false,msg:'18+ only.'}; if((p.bio||'').length>30) return {ok:false,msg:'Bio must be ≤ 30 chars.'}; return {ok:true}; }
+function populateProfileForm(){ const p=getMe(); if(!p) return; const s=id=>document.getElementById(id); if(s('meName')) s('meName').value=p.name||''; if(s('meGender')) s('meGender').value=p.gender||''; if(s('meAge')) s('meAge').value=p.age||''; if(s('meState')) s('meState').value=p.state||''; if(s('meBio')) s('meBio').value=p.bio||''; }
 
 // ===== Thread Meta (accept / unread / requested) =====
 const metaKey=(other)=>'tnbl:meta:'+pairKey(ME, other);
@@ -356,6 +357,7 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
   $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ makeTouchable('.btn, .tab, .user-item, .ad-slot'); }
   // Toggle app state for chat to hide tabbar and reduce bottom padding
   if(id==='#screenChat'){ document.documentElement.classList.add('chatting'); document.body.classList.add('chatting'); } else { document.documentElement.classList.remove('chatting'); document.body.classList.remove('chatting'); }
+  if(id==='#screenSettings'){ populateProfileForm(); }
 }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
