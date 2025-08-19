@@ -347,6 +347,7 @@ function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ c
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
 // ===== Layout recompute (ads/admin/headers/filters/tabbar) =====
+function getNaturalHeight(el){ if(!el) return 0; const cs=getComputedStyle(el); const prev={ display: el.style.display, position: el.style.position, visibility: el.style.visibility, maxHeight: el.style.maxHeight }; let h=0; if(cs.display==='none'){ el.style.visibility='hidden'; el.style.position='absolute'; el.style.display='block'; el.style.maxHeight='none'; h=el.scrollHeight; } else { const prevMax=el.style.maxHeight; el.style.maxHeight='none'; h=el.scrollHeight; el.style.maxHeight=prevMax; } el.style.display=prev.display; el.style.position=prev.position; el.style.visibility=prev.visibility; el.style.maxHeight=prev.maxHeight; return h; }
 function recomputeLayout(){
   // Top ad height
   const adOff = localStorage.getItem('tnbl:adOff')==='1';
@@ -362,7 +363,7 @@ function recomputeLayout(){
   // Ensure expanded filtersWrap tracks its content height on resize
   const wrap=document.getElementById('filtersWrap');
   if(wrap && !wrap.classList.contains('collapsed')){
-    wrap.style.maxHeight = wrap.scrollHeight + 'px';
+    wrap.style.maxHeight = getNaturalHeight(wrap) + 'px';
   }
   // Tabbar height
   const tb=document.querySelector('.tabbar');
