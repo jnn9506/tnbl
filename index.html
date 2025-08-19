@@ -6,7 +6,7 @@
 <title>TNBL – Talk Now Before Look • Mobile‑first Dark (Neon Mint)</title>
 <style>
 /* ===== THEME ===== */
-:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: 0px; --admin-h:0px; --active-top-h:0px; --discover-top-h:0px; --app-w:420px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
+:root{ --bg:#0b0f12; --card:#11161b; --ink:#e6f7f3; --muted:#9bb3ad; --mint:#00f5d4; --mint-2:#19ffd9; --line:#1a2329; --shadow:0 12px 30px rgba(0,0,0,.35); --radius:16px; --danger:#ff6b6b; --warn:#ffd166; --hdr-h:56px; --ad-h:60px; --ad-offset: 0px; --admin-h:0px; --active-top-h:0px; --discover-top-h:0px; --tabbar-h:0px; --container-vpad:24px; --app-w:420px; --ease-spring:cubic-bezier(.2,.85,.25,1); --ease-pop:cubic-bezier(.34,1.56,.64,1); }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{ margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; background:radial-gradient(1200px 600px at 50% -200px, rgba(0,245,212,.08), transparent 70%), var(--bg); color:var(--ink);} 
@@ -35,7 +35,7 @@ button{font-weight:900}
 .btn.ghost{background:#0f1418; color:#var(--ink)}
 .btn.sm{padding:6px 8px; width:auto}
 
-main{padding:12px; padding-bottom:160px; position:relative; display:grid}
+main{padding:12px; padding-bottom:0; position:relative; display:grid}
 .chatting main{padding-bottom:0}
 .screen{display:none; opacity:0; transition:opacity 260ms var(--ease-spring), transform 260ms var(--ease-spring); will-change: transform, opacity; backface-visibility: hidden; transform: translate3d(0,0,0)}
 .screen.active,.screen.leaving{display:block}
@@ -51,8 +51,8 @@ main{padding:12px; padding-bottom:160px; position:relative; display:grid}
 
 /* Lists */
 .list-wrap{height:56vh; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); background:#0f1418}
-#screenActive .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--active-top-h) - 24px)}
-#screenDiscover .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--discover-top-h) - 24px)}
+#screenActive .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) - var(--active-top-h) - var(--container-vpad))}
+#screenDiscover .list-wrap{height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--tabbar-h) - var(--discover-top-h) - var(--container-vpad))}
 .user-item{display:flex; justify-content:space-between; gap:10px; padding:12px; border-bottom:1px solid var(--line); position:relative; transition:background 160ms; flex-wrap:wrap; align-items:flex-start}
 .user-item:hover{background:#0d1317}
 .meta .line1{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
@@ -67,7 +67,7 @@ input::placeholder,textarea::placeholder{color:#6f9189}
 select{padding:10px}
 
 /* Chat */
-#screenChat{flex-direction:column; height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - 24px); min-height:0; overflow:hidden}
+#screenChat{flex-direction:column; height:calc(100dvh - var(--hdr-h) - var(--ad-offset) - var(--admin-h) - var(--container-vpad)); min-height:0; overflow:hidden}
 .screen.active#screenChat, #screenChat.active{display:flex}
 .chat{flex:1; display:grid; grid-template-rows: 1fr auto; height:auto; gap:10px; min-height:0}
 .chat-log{overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; border:1px solid var(--line); border-radius:var(--radius); padding:12px; background:linear-gradient(180deg,#0f161b,#0b0f12)}
@@ -345,27 +345,31 @@ function unreadTotal(){ const all=listUsers(); return all.reduce((acc,u)=>acc+en
 function pendingIncomingCount(){ const all=listUsers(); return all.filter(u=>{ const m=ensureMeta(u.id); return !m.accepted && !m.requested && loadThread(u.id).length>0; }).length; }
 function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount(); const bA=$('#navBadgeActive'); if(total>0){ bA.textContent=String(total); bA.style.display='inline-flex'; } else { bA.style.display='none'; } }
 
-// ===== Layout recompute (ads/admin/headers/filters) =====
+// ===== Layout recompute (ads/admin/headers/filters/tabbar) =====
 function recomputeLayout(){
-  // Ad height
-  const off = localStorage.getItem('tnbl:adOff')==='1';
-  const topAd=document.getElementById('adTop');
-  const adVisible = !off && topAd && getComputedStyle(topAd).display!=='none';
-  const adH = adVisible ? getComputedStyle(topAd).height : '0px';
+  // Top ad height
+  const adOff = localStorage.getItem('tnbl:adOff')==='1';
+  const adEl=document.getElementById('adTop');
+  const adVisible=!adOff && adEl && getComputedStyle(adEl).display!=='none';
+  const adH=adVisible?getComputedStyle(adEl).height:'0px';
   document.documentElement.style.setProperty('--ad-offset', adH);
-  // Admin height
+  // Admin panel height
   const admin=document.getElementById('adminPanel');
-  const adminOpen = admin && admin.style.display==='block';
-  const adminH = adminOpen ? (admin.getBoundingClientRect().height + 10) + 'px' : '0px';
+  const adminOpen=admin && admin.style.display==='block';
+  const adminH=adminOpen?(admin.getBoundingClientRect().height+10)+'px':'0px';
   document.documentElement.style.setProperty('--admin-h', adminH);
-  // Active/Discover top card heights
+  // Tabbar height
+  const tb=document.querySelector('.tabbar .inner');
+  const tbH=tb?getComputedStyle(tb).height:'0px';
+  document.documentElement.style.setProperty('--tabbar-h', tbH);
+  // Top cards (Active/Discover) including filter area
   const aTop=document.querySelector('#screenActive .card');
   const dTop=document.querySelector('#screenDiscover .card');
-  document.documentElement.style.setProperty('--active-top-h', aTop? (aTop.getBoundingClientRect().height + 10) + 'px' : '0px');
-  document.documentElement.style.setProperty('--discover-top-h', dTop? (dTop.getBoundingClientRect().height + 10) + 'px' : '0px');
+  document.documentElement.style.setProperty('--active-top-h', aTop?(aTop.getBoundingClientRect().height+10)+'px':'0px');
+  document.documentElement.style.setProperty('--discover-top-h', dTop?(dTop.getBoundingClientRect().height+10)+'px':'0px');
 }
 
-// Ads (device scoped)
+// Ads update hooks
 function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); recomputeLayout(); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
@@ -389,7 +393,6 @@ function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenS
   // Toggle app state for chat to hide tabbar and reduce bottom padding
   if(id==='#screenChat'){ document.documentElement.classList.add('chatting'); document.body.classList.add('chatting'); }
   if(id!=='#screenChat'){ document.documentElement.classList.remove('chatting'); document.body.classList.remove('chatting'); }
-  // After any tab switch, recompute layout since top cards differ per tab
   setTimeout(recomputeLayout, 0);
   if(id==='#screenSettings'){ populateProfileForm(); }
 }
@@ -441,7 +444,7 @@ function seedActivityDummies(){ const users=listUsers(); if(users.length<3){ see
 
 // ===== Boot =====
 function boot(){ if(__booted) return; __booted = true; document.body.classList.remove('preload'); updateAd(); seedActivityDummies(); applyFiltersCollapsedState(); selectTab('#screenDiscover'); renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); recomputeLayout(); }
-document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('preload'); requestAnimationFrame(()=>boot()); window.addEventListener('resize', recomputeLayout); const mo=new MutationObserver(()=>recomputeLayout()); const admin=document.getElementById('adminPanel'); if(admin) mo.observe(admin,{attributes:true,attributeFilter:['style','class']}); const ad=document.getElementById('adTop'); if(ad) mo.observe(ad,{attributes:true,attributeFilter:['style','class']}); });
+document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('preload'); requestAnimationFrame(()=>boot()); window.addEventListener('resize', recomputeLayout); });
 </script>
 </body>
 </html>
