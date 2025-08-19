@@ -113,7 +113,6 @@ select{padding:10px}
     <div class="brand"><span class="dot"></span> TNBL <span class="muted">Talk Now Before Look</span></div>
     <div class="spacer"></div>
     <span class="pill" id="adminToggle">Dev</span>
-    <span class="pill" id="adsPill" style="display:none">Ads: <strong id="adState">ON</strong></span>
   </div>
 </header>
 
@@ -315,14 +314,14 @@ function updateNavBadges(){ const total = unreadTotal() + pendingIncomingCount()
 
 // ===== Ads (device scoped) =====
 function setAdOffsets(off){ /* body no longer shifts for ads */ document.documentElement.style.setProperty('--ad-offset', '0px'); }
-function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; const adEl=$('#adState'); if(adEl) adEl.textContent = off ? 'OFF' : 'ON'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
+function updateAd(){ const off = localStorage.getItem('tnbl:adOff')==='1'; $$('.ad-slot').forEach(el=>{ if(el.id==='adTop'){ el.style.display = off ? 'none' : 'flex'; } else { el.style.display = 'block'; } }); setAdOffsets(off); const btn=$('#toggleAdBtn'); if(btn) btn.textContent = off ? 'Ad ON' : 'Ad OFF'; }
 
 // ===== Tabbar / Binds =====
 function selectTab(id){ const order=['#screenActive','#screenDiscover','#screenSettings']; const current=document.querySelector('.screen.active'); const next=document.querySelector(id); if(!next || current===next) return; const curId = '#'+(current?.id||''); const dir = order.indexOf(id) > order.indexOf(curId) ? 'left' : 'right'; next.classList.add('active','anim'); current?.classList.add('anim'); if(dir==='left'){ current?.classList.add('slide-out-left'); next.classList.add('slide-in-right'); } else { current?.classList.add('slide-out-right'); next.classList.add('slide-in-left'); } setTimeout(()=>{ current?.classList.remove('active','anim','slide-out-left','slide-out-right'); next.classList.remove('anim','slide-in-left','slide-in-right'); },260); $$('.tab').forEach(t=>t.classList.remove('active')); const tab=document.querySelector(`.tab[data-tab="${id}"]`); if(tab) tab.classList.add('active'); if(id==='#screenActive'||id==='#screenDiscover'){ renderLists(); makeTouchable('.btn, .tab, .user-item, .ad-slot'); } }
 $$('.tab').forEach(t=> t.addEventListener('click', ()=> selectTab(t.getAttribute('data-tab')) ));
 
 // Admin panel
-$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; const adsPill=$('#adsPill'); if(adsPill){ adsPill.style.display = open ? 'inline-flex' : 'none'; } }});
+$('#adminToggle').addEventListener('click',()=>{ const p=$('#adminPanel'); if(p){ const open = (p.style.display==='none'||!p.style.display)?true:false; p.style.display = open?'block':'none'; }});
 $('#seedBtn').addEventListener('click',()=>{ seedUsers(20); seedActivityDummies(); renderLists(); });
 $('#clearBtn').addEventListener('click',()=>{ clearUsers(); renderLists(); });
 $('#toggleAdBtn').addEventListener('click',()=>{ const off = localStorage.getItem('tnbl:adOff')==='1'; localStorage.setItem('tnbl:adOff', off ? '0' : '1'); updateAd(); });
