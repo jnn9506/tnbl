@@ -29,7 +29,7 @@
     <div id="flutter_target"></div>
     <script>
       window.addEventListener('load', function(ev) {
-        _flutter.loader.loadEntrypoint({}).then(function(engineInitializer) {
+        _flutter.loader.loadEntrypoint({ entrypointUrl: 'main.dart.js' }).then(function(engineInitializer) {
           return engineInitializer.initializeEngine();
         }).then(function(appRunner) {
           return appRunner.runApp();
