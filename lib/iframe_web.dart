@@ -1,8 +1,7 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
-// ignore: undefined_prefixed_name
-import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart' as web;
 
 class ArchiveIframe extends StatelessWidget {
 	const ArchiveIframe({super.key});
@@ -16,13 +15,13 @@ class ArchiveIframe extends StatelessWidget {
 			..style.height = '100%';
 		// Fill viewport
 		html.document.documentElement?.style.height = '100%';
-		html.document.body?.style
-			..margin = '0'
-			..height = '100%';
-		// Register factory
-		// ignore: undefined_prefixed_name
-		ui.platformViewRegistry.registerViewFactory('iframe-view', (int viewId) => element);
+		final body = html.document.body;
+		if (body != null) {
+			body.style.margin = '0';
+			body.style.height = '100%';
+		}
+		// Register factory via flutter_web_plugins
+		web.registerViewFactory('iframe-view', (int viewId) => element);
 		return const HtmlElementView(viewType: 'iframe-view');
 	}
 }
-
