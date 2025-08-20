@@ -1,6 +1,9 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+// ignore: undefined_prefixed_name
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
 	runApp(const TnblApp());

@@ -17,6 +17,15 @@
   </head>
   <body>
     <script src="flutter.js" defer></script>
+    <script>
+      // Ensure correct base for Flutter asset loader when using project pages
+      window.addEventListener('load', () => {
+        if (window.flutterConfiguration == null) {
+          window.flutterConfiguration = {};
+        }
+        window.flutterConfiguration.autoDetectBaseHref = true;
+      });
+    </script>
     <div id="flutter_target"></div>
     <script>
       window.addEventListener('load', function(ev) {
